@@ -1,0 +1,103 @@
+# generated: 2026-02-03
+# project: aurelien-project
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: "2026-02-03"
+project: "aurelien-project"
+tracking_system: "file-system"
+story_location: "_bmad-output/implementation-artifacts"
+
+development_status:
+  # ============================================
+  # Epic 1: Fondation Projet & Authentification
+  # ============================================
+  epic-1: in-progress
+  1-1-initialisation-du-projet: done
+  1-2-fondation-design-system: done
+  1-3-schema-base-de-donnees-et-configuration-auth: backlog
+  1-4-inscription-fournisseur: backlog
+  1-5-inscription-magasin: backlog
+  1-6-connexion-utilisateur: backlog
+  1-7-deconnexion-utilisateur: backlog
+  1-8-reinitialisation-mot-de-passe: backlog
+  epic-1-retrospective: optional
+
+  # ============================================
+  # Epic 2: Gestion des Offres Fournisseur
+  # ============================================
+  epic-2: backlog
+  2-1-schema-offres-et-page-liste-vide: backlog
+  2-2-creation-offre-champs-obligatoires: backlog
+  2-3-enrichissement-offre-champs-optionnels: backlog
+  2-4-liste-des-offres-fournisseur: backlog
+  2-5-modification-offre: backlog
+  2-6-suppression-offre: backlog
+  epic-2-retrospective: optional
+
+  # ============================================
+  # Epic 3: Découverte des Offres Magasin
+  # ============================================
+  epic-3: backlog
+  3-1-liste-des-offres-disponibles: backlog
+  3-2-filtrage-par-categorie: backlog
+  3-3-filtrage-par-date-et-fournisseur: backlog
+  3-4-filtrage-par-enseigne-compatible: backlog
+  3-5-detail-complet-offre: backlog
+  epic-3-retrospective: optional
+
+  # ============================================
+  # Epic 4: Interactions Magasin (Système de Demandes)
+  # ============================================
+  epic-4: backlog
+  4-1-schema-demandes-et-envoi-demande-renseignements: backlog
+  4-2-envoi-intention-de-commande: backlog
+  4-3-historique-des-demandes-magasin: backlog
+  epic-4-retrospective: optional
+
+  # ============================================
+  # Epic 5: Gestion des Demandes Fournisseur
+  # ============================================
+  epic-5: backlog
+  5-1-liste-des-demandes-recues: backlog
+  5-2-filtrage-des-demandes: backlog
+  5-3-traitement-demande: backlog
+  epic-5-retrospective: optional
+
+  # ============================================
+  # Epic 6: Système de Notifications
+  # ============================================
+  epic-6: backlog
+  6-1-schema-notifications-et-notification-in-app: backlog
+  6-2-notification-email: backlog
+  6-3-gestion-des-notifications: backlog
+  epic-6-retrospective: optional

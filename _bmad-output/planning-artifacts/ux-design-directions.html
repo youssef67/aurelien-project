@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>aurelien-project - UX Design Direction Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables - Slate Monochrome */
+        :root {
+            --primary: #0F172A;
+            --primary-foreground: #FFFFFF;
+            --secondary: #F1F5F9;
+            --secondary-foreground: #0F172A;
+            --accent: #475569;
+            --accent-foreground: #FFFFFF;
+            --success: #059669;
+            --success-foreground: #FFFFFF;
+            --warning: #D97706;
+            --warning-foreground: #FFFFFF;
+            --destructive: #E11D48;
+            --destructive-foreground: #FFFFFF;
+            --background: #FFFFFF;
+            --foreground: #0F172A;
+            --card: #FFFFFF;
+            --card-foreground: #0F172A;
+            --muted: #F1F5F9;
+            --muted-foreground: #64748B;
+            --border: #E2E8F0;
+            --input: #E2E8F0;
+            --ring: #94A3B8;
+            --radius: 12px;
+            --radius-md: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #F8FAFC;
+            color: var(--foreground);
+            line-height: 1.5;
+        }
+
+        /* Page Layout */
+        .page-header {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            padding: 24px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--foreground);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* Color Palette Section */
+        .color-section {
+            margin-bottom: 48px;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .color-swatch {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .color-preview {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .color-info {
+            padding: 12px;
+        }
+
+        .color-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .color-hex {
+            font-size: 12px;
+            color: var(--muted-foreground);
+            font-family: monospace;
+        }
+
+        /* Typography Section */
+        .typography-section {
+            margin-bottom: 48px;
+        }
+
+        .type-scale {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+        }
+
+        .type-item {
+            display: flex;
+            align-items: baseline;
+            gap: 24px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .type-item:last-child {
+            border-bottom: none;
+        }
+
+        .type-label {
+            font-size: 12px;
+            color: var(--muted-foreground);
+            width: 80px;
+            flex-shrink: 0;
+        }
+
+        .text-xs { font-size: 12px; }
+        .text-sm { font-size: 14px; }
+        .text-base { font-size: 16px; }
+        .text-lg { font-size: 18px; font-weight: 500; }
+        .text-xl { font-size: 20px; font-weight: 600; }
+        .text-2xl { font-size: 24px; font-weight: 600; }
+        .text-3xl { font-size: 30px; font-weight: 700; }
+
+        /* Mobile Mockups */
+        .mockups-section {
+            margin-bottom: 48px;
+        }
+
+        .mockups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            justify-items: center;
+        }
+
+        .mockup-container {
+            text-align: center;
+        }
+
+        .mockup-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--muted-foreground);
+            margin-bottom: 16px;
+        }
+
+        .phone-frame {
+            width: 320px;
+            height: 640px;
+            background: var(--background);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            border: 8px solid var(--primary);
+            position: relative;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 0 0 16px 16px;
+            z-index: 10;
+        }
+
+        .phone-screen {
+            height: 100%;
+            overflow-y: auto;
+            padding-top: 24px;
+        }
+
+        /* App Header */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .app-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background: var(--secondary);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: var(--border);
+        }
+
+        /* Filter Chips */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            border: 1px solid var(--border);
+            background: var(--background);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip:hover {
+            background: var(--secondary);
+        }
+
+        .filter-chip.active {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            border-color: var(--primary);
+        }
+
+        /* Offer Cards */
+        .offers-list {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .offer-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .offer-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .offer-image {
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            position: relative;
+        }
+
+        .offer-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-new {
+            background: var(--success);
+            color: var(--success-foreground);
+        }
+
+        .badge-requested {
+            background: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .offer-content {
+            padding: 16px;
+        }
+
+        .offer-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .offer-meta {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+
+        .meta-item {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .meta-label {
+            color: var(--muted-foreground);
+            font-weight: 400;
+        }
+
+        .offer-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--muted-foreground);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            background: var(--background);
+            border-top: 1px solid var(--border);
+            padding: 8px 0;
+            padding-bottom: 20px;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            color: var(--muted-foreground);
+            text-decoration: none;
+            font-size: 11px;
+            transition: color 0.2s;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        /* Detail Screen */
+        .detail-image {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+
+        .detail-content {
+            padding: 20px 16px;
+        }
+
+        .detail-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .detail-item {
+            background: var(--muted);
+            padding: 16px;
+            border-radius: var(--radius-md);
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--muted-foreground);
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .detail-value.highlight {
+            color: var(--success);
+        }
+
+        .detail-section {
+            margin-bottom: 24px;
+        }
+
+        .detail-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--muted-foreground);
+        }
+
+        .detail-text {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Buttons */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--secondary-foreground);
+            margin-top: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .detail-actions {
+            padding: 16px;
+            padding-bottom: 32px;
+            position: sticky;
+            bottom: 0;
+            background: var(--background);
+            border-top: 1px solid var(--border);
+        }
+
+        /* Supplier Screen */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--muted-foreground);
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .fab {
+            position: absolute;
+            bottom: 100px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: var(--primary);
+            color: var(--primary-foreground);
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s;
+        }
+
+        .fab:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .demand-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .demand-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .demand-store {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .demand-type {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: var(--success);
+            color: var(--success-foreground);
+        }
+
+        .demand-type.info {
+            background: var(--secondary);
+            color: var(--secondary-foreground);
+        }
+
+        .demand-offer {
+            font-size: 13px;
+            color: var(--muted-foreground);
+            margin-bottom: 8px;
+        }
+
+        .demand-time {
+            font-size: 12px;
+            color: var(--muted-foreground);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: var(--primary-foreground);
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Components Section */
+        .components-section {
+            margin-bottom: 48px;
+        }
+
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .component-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+        }
+
+        .component-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--muted-foreground);
+            margin-bottom: 16px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn-demo {
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .input-demo {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--input);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-family: inherit;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .input-demo:focus {
+            outline: none;
+            border-color: var(--ring);
+            box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.2);
+        }
+
+        .badge-demo {
+            display: inline-flex;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        /* Footer */
+        .page-footer {
+            background: var(--muted);
+            padding: 32px 24px;
+            text-align: center;
+            color: var(--muted-foreground);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <h1>aurelien-project</h1>
+        <p>UX Design Direction Preview - Slate Monochrome</p>
+    </header>
+
+    <div class="container">
+        <!-- Color Palette -->
+        <section class="color-section">
+            <h2 class="section-title">Palette de couleurs</h2>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: #0F172A;">Primary</div>
+                    <div class="color-info">
+                        <div class="color-name">Primary</div>
+                        <div class="color-hex">#0F172A</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: #F1F5F9; color: #0F172A;">Secondary</div>
+                    <div class="color-info">
+                        <div class="color-name">Secondary</div>
+                        <div class="color-hex">#F1F5F9</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: #475569;">Accent</div>
+                    <div class="color-info">
+                        <div class="color-name">Accent</div>
+                        <div class="color-hex">#475569</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: #059669;">Success</div>
+                    <div class="color-info">
+                        <div class="color-name">Success</div>
+                        <div class="color-hex">#059669</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: #D97706;">Warning</div>
+                    <div class="color-info">
+                        <div class="color-name">Warning</div>
+                        <div class="color-hex">#D97706</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: #E11D48;">Destructive</div>
+                    <div class="color-info">
+                        <div class="color-name">Destructive</div>
+                        <div class="color-hex">#E11D48</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: #64748B;">Muted</div>
+                    <div class="color-info">
+                        <div class="color-name">Muted</div>
+                        <div class="color-hex">#64748B</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: #E2E8F0; color: #0F172A;">Border</div>
+                    <div class="color-info">
+                        <div class="color-name">Border</div>
+                        <div class="color-hex">#E2E8F0</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Typography -->
+        <section class="typography-section">
+            <h2 class="section-title">Typographie - Inter</h2>
+            <div class="type-scale">
+                <div class="type-item">
+                    <span class="type-label">text-3xl</span>
+                    <span class="text-3xl">Offres promotionnelles</span>
+                </div>
+                <div class="type-item">
+                    <span class="type-label">text-2xl</span>
+                    <span class="text-2xl">Nutella 1kg - Promo</span>
+                </div>
+                <div class="type-item">
+                    <span class="type-label">text-xl</span>
+                    <span class="text-xl">Conditions commerciales</span>
+                </div>
+                <div class="type-item">
+                    <span class="type-label">text-lg</span>
+                    <span class="text-lg">Marge proposee: 24%</span>
+                </div>
+                <div class="type-item">
+                    <span class="type-label">text-base</span>
+                    <span class="text-base">Livraison sous 3 jours, minimum 50 colis par commande.</span>
+                </div>
+                <div class="type-item">
+                    <span class="type-label">text-sm</span>
+                    <span class="text-sm">Valable du 15 au 28 fevrier 2026</span>
+                </div>
+                <div class="type-item">
+                    <span class="type-label">text-xs</span>
+                    <span class="text-xs">Ferrero France SAS - Ref: NUT-1KG-FEV26</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Components -->
+        <section class="components-section">
+            <h2 class="section-title">Composants UI</h2>
+            <div class="components-grid">
+                <div class="component-card">
+                    <div class="component-title">Boutons</div>
+                    <div class="button-group">
+                        <button class="btn-demo" style="background: var(--primary); color: white;">Souhaite commander</button>
+                        <button class="btn-demo" style="background: var(--secondary); color: var(--secondary-foreground);">Renseignements</button>
+                        <button class="btn-demo" style="background: var(--success); color: white;">Confirmer</button>
+                        <button class="btn-demo" style="background: transparent; border: 1px solid var(--border); color: var(--foreground);">Annuler</button>
+                    </div>
+                </div>
+                <div class="component-card">
+                    <div class="component-title">Champs de saisie</div>
+                    <input type="text" class="input-demo" placeholder="Nom du produit">
+                    <input type="text" class="input-demo" placeholder="Prix promo (ex: 8.50)">
+                </div>
+                <div class="component-card">
+                    <div class="component-title">Badges</div>
+                    <span class="badge-demo" style="background: var(--success); color: white;">Nouveau</span>
+                    <span class="badge-demo" style="background: var(--primary); color: white;">Demande</span>
+                    <span class="badge-demo" style="background: var(--warning); color: white;">Expire bientot</span>
+                    <span class="badge-demo" style="background: var(--muted); color: var(--muted-foreground);">Traite</span>
+                </div>
+                <div class="component-card">
+                    <div class="component-title">Filter Chips</div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <span class="filter-chip active">Tous</span>
+                        <span class="filter-chip">Epicerie</span>
+                        <span class="filter-chip">Frais</span>
+                        <span class="filter-chip">DPH</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mobile Mockups -->
+        <section class="mockups-section">
+            <h2 class="section-title">Ecrans Mobile</h2>
+            <div class="mockups-grid">
+                <!-- Screen 1: Offers List (Julien) -->
+                <div class="mockup-container">
+                    <div class="mockup-label">Liste des offres (Julien)</div>
+                    <div class="phone-frame">
+                        <div class="phone-notch"></div>
+                        <div class="phone-screen">
+                            <div class="app-header">
+                                <span class="app-title">Offres</span>
+                                <div class="header-actions">
+                                    <button class="icon-btn">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                                        </svg>
+                                    </button>
+                                    <button class="icon-btn">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="filter-bar">
+                                <span class="filter-chip active">Tous</span>
+                                <span class="filter-chip">Epicerie</span>
+                                <span class="filter-chip">Frais</span>
+                                <span class="filter-chip">DPH</span>
+                            </div>
+                            <div class="offers-list">
+                                <div class="offer-card">
+                                    <div class="offer-image">
+                                        <span class="offer-badge badge-new">Nouveau</span>
+                                    </div>
+                                    <div class="offer-content">
+                                        <div class="offer-title">Nutella 1kg</div>
+                                        <div class="offer-meta">
+                                            <span class="meta-item">-22%</span>
+                                            <span class="meta-item highlight" style="color: var(--success);">Marge 24%</span>
+                                        </div>
+                                        <div class="offer-footer">
+                                            <span>15-28 fev</span>
+                                            <span>Ferrero</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="offer-card">
+                                    <div class="offer-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                        <span class="offer-badge badge-requested">Demande</span>
+                                    </div>
+                                    <div class="offer-content">
+                                        <div class="offer-title">Barilla Spaghetti 500g</div>
+                                        <div class="offer-meta">
+                                            <span class="meta-item">-18%</span>
+                                            <span class="meta-item highlight" style="color: var(--success);">Marge 21%</span>
+                                        </div>
+                                        <div class="offer-footer">
+                                            <span>20 fev - 5 mars</span>
+                                            <span>Barilla</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bottom-nav">
+                                <a href="#" class="nav-item active">
+                                    <span class="nav-icon">
+                                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                                        </svg>
+                                    </span>
+                                    <span>Offres</span>
+                                </a>
+                                <a href="#" class="nav-item">
+                                    <span class="nav-icon">
+                                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                                        </svg>
+                                    </span>
+                                    <span>Demandes</span>
+                                </a>
+                                <a href="#" class="nav-item">
+                                    <span class="nav-icon">
+                                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                        </svg>
+                                    </span>
+                                    <span>Profil</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Screen 2: Offer Detail -->
+                <div class="mockup-container">
+                    <div class="mockup-label">Detail offre</div>
+                    <div class="phone-frame">
+                        <div class="phone-notch"></div>
+                        <div class="phone-screen">
+                            <div class="app-header">
+                                <span style="display: flex; align-items: center; gap: 12px;">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path d="m15 18-6-6 6-6"/>
+                                    </svg>
+                                    <span class="app-title">Nutella 1kg</span>
+                                </span>
+                            </div>
+                            <div class="detail-image"></div>
+                            <div class="detail-content">
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label">Prix promo</div>
+                                        <div class="detail-value">8,50 EUR</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Remise</div>
+                                        <div class="detail-value">-22%</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Marge</div>
+                                        <div class="detail-value highlight">24%</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">Validite</div>
+                                        <div class="detail-value">15-28 fev</div>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <div class="detail-section-title">Conditions</div>
+                                    <div class="detail-text">Livraison J+3, minimum 50 colis. PLV tete de gondole incluse.</div>
+                                </div>
+                            </div>
+                            <div class="detail-actions">
+                                <button class="btn btn-primary">Souhaite commander</button>
+                                <button class="btn btn-secondary">Demande de renseignements</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Screen 3: Supplier Dashboard (Sophie) -->
+                <div class="mockup-container">
+                    <div class="mockup-label">Tableau de bord (Sophie)</div>
+                    <div class="phone-frame">
+                        <div class="phone-notch"></div>
+                        <div class="phone-screen">
+                            <div class="app-header">
+                                <span class="app-title">Mes demandes</span>
+                                <div class="header-actions">
+                                    <button class="icon-btn">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="tabs">
+                                <div class="tab">Mes offres</div>
+                                <div class="tab active">Demandes</div>
+                                <div class="tab">Stats</div>
+                            </div>
+                            <div class="offers-list">
+                                <div class="demand-card">
+                                    <div class="demand-header">
+                                        <div>
+                                            <div class="demand-store">Leclerc Strasbourg</div>
+                                            <div class="demand-offer">Nutella 1kg - Promo fevrier</div>
+                                        </div>
+                                        <span class="demand-type">Commande</span>
+                                    </div>
+                                    <div class="demand-time">Il y a 2 heures</div>
+                                </div>
+                                <div class="demand-card">
+                                    <div class="demand-header">
+                                        <div>
+                                            <div class="demand-store">Intermarche Colmar</div>
+                                            <div class="demand-offer">Nutella 1kg - Promo fevrier</div>
+                                        </div>
+                                        <span class="demand-type info">Renseignements</span>
+                                    </div>
+                                    <div class="demand-time">Il y a 5 heures</div>
+                                </div>
+                                <div class="demand-card">
+                                    <div class="demand-header">
+                                        <div>
+                                            <div class="demand-store">Super U Mulhouse</div>
+                                            <div class="demand-offer">Kinder Bueno x30</div>
+                                        </div>
+                                        <span class="demand-type">Commande</span>
+                                    </div>
+                                    <div class="demand-time">Hier</div>
+                                </div>
+                            </div>
+                            <button class="fab">+</button>
+                            <div class="bottom-nav">
+                                <a href="#" class="nav-item">
+                                    <span class="nav-icon">
+                                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                                        </svg>
+                                    </span>
+                                    <span>Offres</span>
+                                </a>
+                                <a href="#" class="nav-item active">
+                                    <span class="nav-icon">
+                                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                                        </svg>
+                                    </span>
+                                    <span>Demandes</span>
+                                </a>
+                                <a href="#" class="nav-item">
+                                    <span class="nav-icon">
+                                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                        </svg>
+                                    </span>
+                                    <span>Profil</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Toast Demo -->
+        <section class="components-section">
+            <h2 class="section-title">Feedback & Notifications</h2>
+            <div class="components-grid">
+                <div class="component-card">
+                    <div class="component-title">Toast de confirmation</div>
+                    <div style="position: relative; height: 80px; background: var(--muted); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+                        <div style="background: var(--primary); color: white; padding: 12px 24px; border-radius: var(--radius-md); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Demande envoyee a Ferrero
+                        </div>
+                    </div>
+                </div>
+                <div class="component-card">
+                    <div class="component-title">Notification Push</div>
+                    <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px;">
+                        <div style="display: flex; gap: 12px; align-items: flex-start;">
+                            <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; flex-shrink: 0;"></div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">aurelien-project</div>
+                                <div style="font-size: 13px; color: var(--muted-foreground);">Leclerc Strasbourg souhaite commander - Nutella 1kg</div>
+                            </div>
+                            <div style="font-size: 12px; color: var(--muted-foreground);">2min</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="page-footer">
+        <p>aurelien-project - UX Design Specification</p>
+        <p style="margin-top: 8px; opacity: 0.7;">Direction: Slate Monochrome Professional | Font: Inter | Design System: shadcn/ui + Tailwind</p>
+    </footer>
+</body>
+</html>
