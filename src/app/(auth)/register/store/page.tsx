@@ -1,30 +1,39 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { RegisterStoreForm } from '@/components/forms/register-store-form'
 
 export const metadata: Metadata = {
   title: 'Inscription Magasin - Aurelien Project',
+  description: 'Créez votre compte magasin pour accéder aux offres promotionnelles des fournisseurs',
 }
 
 export default function RegisterStorePage() {
   return (
-    <div className="w-full max-w-sm space-y-6">
+    <div className="w-full max-w-md space-y-6">
       <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-bold">Inscription Magasin</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Inscription Magasin
+        </h1>
         <p className="text-muted-foreground">
-          Créez votre compte magasin
+          Créez votre compte pour accéder aux offres
         </p>
       </div>
 
-      <div className="space-y-4">
-        <p className="text-sm text-muted-foreground text-center">
-          Formulaire d&apos;inscription magasin (à implémenter)
-        </p>
-      </div>
+      <RegisterStoreForm />
 
-      <div className="text-center text-sm">
-        <Link href="/register" className="text-primary hover:underline">
-          ← Retour au choix
-        </Link>
+      <div className="space-y-2 text-center text-sm">
+        <p className="text-muted-foreground">
+          Déjà un compte ?{' '}
+          <Link href="/login" className="text-primary hover:underline">
+            Connectez-vous
+          </Link>
+        </p>
+        <p className="text-muted-foreground">
+          Vous êtes un fournisseur ?{' '}
+          <Link href="/register/supplier" className="text-primary hover:underline">
+            Inscrivez-vous ici
+          </Link>
+        </p>
       </div>
     </div>
   )

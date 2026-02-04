@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { registerSupplierSchema } from './auth'
+import { registerSupplierSchema, registerStoreSchema, BrandEnum, BRAND_LABELS } from './auth'
 
 describe('registerSupplierSchema', () => {
   describe('valid inputs', () => {
@@ -161,5 +161,215 @@ describe('registerSupplierSchema', () => {
         expect(issues[0]?.message).toContain('numéro de téléphone valide')
       }
     })
+  })
+})
+
+// ============================================
+// Store Registration Schema Tests
+// ============================================
+
+describe('registerStoreSchema', () => {
+  describe('valid inputs', () => {
+    it('accepts valid input with all fields', () => {
+      const result = registerStoreSchema.safeParse({
+        name: 'Super U Bordeaux',
+        brand: 'SUPER_U',
+        email: 'contact@superubordeaux.fr',
+        city: 'Bordeaux',
+        phone: '0556123456',
+        password: 'password123',
+        confirmPassword: 'password123',
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts valid input without phone (optional)', () => {
+      const result = registerStoreSchema.safeParse({
+        name: 'Leclerc Paris',
+        brand: 'LECLERC',
+        email: 'test@example.com',
+        city: 'Paris',
+        phone: '',
+        password: 'password123',
+        confirmPassword: 'password123',
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts all valid brand values', () => {
+      const brands = ['LECLERC', 'INTERMARCHE', 'SUPER_U', 'SYSTEME_U'] as const
+      brands.forEach(brand => {
+        const result = registerStoreSchema.safeParse({
+          name: 'Mon Magasin',
+          brand,
+          email: 'test@example.com',
+          city: 'Paris',
+          password: 'password123',
+          confirmPassword: 'password123',
+        })
+        expect(result.success).toBe(true)
+      })
+    })
+  })
+
+  describe('brand validation', () => {
+    it('rejects invalid brand', () => {
+      const result = registerStoreSchema.safeParse({
+        name: 'Mon Magasin',
+        brand: 'INVALID_BRAND',
+        email: 'test@example.com',
+        city: 'Paris',
+        password: 'password123',
+        confirmPassword: 'password123',
+      })
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects missing brand', () => {
+      const result = registerStoreSchema.safeParse({
+        name: 'Mon Magasin',
+        email: 'test@example.com',
+        city: 'Paris',
+        password: 'password123',
+        confirmPassword: 'password123',
+      })
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('name validation', () => {
+    it('rejects name shorter than 2 characters', () => {
+      const result = registerStoreSchema.safeParse({
+        name: 'A',
+        brand: 'LECLERC',
+        email: 'test@example.com',
+        city: 'Paris',
+        password: 'password123',
+        confirmPassword: 'password123',
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        const issues = JSON.parse(result.error.message)
+        expect(issues[0]?.message).toContain('2 caractères')
+      }
+    })
+
+    it('rejects name longer than 100 characters', () => {
+      const result = registerStoreSchema.safeParse({
+        name: 'A'.repeat(101),
+        brand: 'LECLERC',
+        email: 'test@example.com',
+        city: 'Paris',
+        password: 'password123',
+        confirmPassword: 'password123',
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        const issues = JSON.parse(result.error.message)
+        expect(issues[0]?.message).toContain('100 caractères')
+      }
+    })
+  })
+
+  describe('city validation', () => {
+    it('rejects city shorter than 2 characters', () => {
+      const result = registerStoreSchema.safeParse({
+        name: 'Mon Magasin',
+        brand: 'LECLERC',
+        email: 'test@example.com',
+        city: 'A',
+        password: 'password123',
+        confirmPassword: 'password123',
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        const issues = JSON.parse(result.error.message)
+        expect(issues[0]?.message).toContain('2 caractères')
+      }
+    })
+
+    it('rejects missing city', () => {
+      const result = registerStoreSchema.safeParse({
+        name: 'Mon Magasin',
+        brand: 'LECLERC',
+        email: 'test@example.com',
+        city: '',
+        password: 'password123',
+        confirmPassword: 'password123',
+      })
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('email validation', () => {
+    it('rejects invalid email format', () => {
+      const result = registerStoreSchema.safeParse({
+        name: 'Mon Magasin',
+        brand: 'LECLERC',
+        email: 'invalid-email',
+        city: 'Paris',
+        password: 'password123',
+        confirmPassword: 'password123',
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        const issues = JSON.parse(result.error.message)
+        expect(issues[0]?.message).toContain('email valide')
+      }
+    })
+  })
+
+  describe('password validation', () => {
+    it('rejects password shorter than 8 characters', () => {
+      const result = registerStoreSchema.safeParse({
+        name: 'Mon Magasin',
+        brand: 'LECLERC',
+        email: 'test@example.com',
+        city: 'Paris',
+        password: 'short',
+        confirmPassword: 'short',
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        const issues = JSON.parse(result.error.message)
+        expect(issues[0]?.message).toContain('8 caractères')
+      }
+    })
+
+    it('rejects mismatched passwords', () => {
+      const result = registerStoreSchema.safeParse({
+        name: 'Mon Magasin',
+        brand: 'LECLERC',
+        email: 'test@example.com',
+        city: 'Paris',
+        password: 'password123',
+        confirmPassword: 'different',
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        const issues = JSON.parse(result.error.message)
+        expect(issues[0]?.message).toContain('ne correspondent pas')
+      }
+    })
+  })
+})
+
+describe('BrandEnum', () => {
+  it('contains all expected brands', () => {
+    const brands = BrandEnum.options
+    expect(brands).toContain('LECLERC')
+    expect(brands).toContain('INTERMARCHE')
+    expect(brands).toContain('SUPER_U')
+    expect(brands).toContain('SYSTEME_U')
+    expect(brands.length).toBe(4)
+  })
+})
+
+describe('BRAND_LABELS', () => {
+  it('has French labels for all brands', () => {
+    expect(BRAND_LABELS.LECLERC).toBe('Leclerc')
+    expect(BRAND_LABELS.INTERMARCHE).toBe('Intermarché')
+    expect(BRAND_LABELS.SUPER_U).toBe('Super U')
+    expect(BRAND_LABELS.SYSTEME_U).toBe('Système U')
   })
 })
