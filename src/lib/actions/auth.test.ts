@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { registerSupplier, registerStore, login, logout, resendConfirmationEmail } from './auth'
+import { registerSupplier, registerStore, login, logout, resendConfirmationEmail, requestPasswordReset, updatePassword } from './auth'
 
 // Mock Supabase
 const mockSignUp = vi.fn()
 const mockSignInWithPassword = vi.fn()
 const mockSignOut = vi.fn()
 const mockResend = vi.fn()
+const mockResetPasswordForEmail = vi.fn()
+const mockUpdateUser = vi.fn()
 const mockInsert = vi.fn()
 const mockFrom = vi.fn(() => ({ insert: mockInsert }))
 const mockDeleteUser = vi.fn()
@@ -17,6 +19,8 @@ vi.mock('@/lib/supabase/server', () => ({
       signInWithPassword: mockSignInWithPassword,
       signOut: mockSignOut,
       resend: mockResend,
+      resetPasswordForEmail: mockResetPasswordForEmail,
+      updateUser: mockUpdateUser,
     },
   })),
   createAdminClient: vi.fn(() => ({
@@ -26,6 +30,13 @@ vi.mock('@/lib/supabase/server', () => ({
         deleteUser: mockDeleteUser,
       },
     },
+  })),
+}))
+
+// Mock next/headers pour requestPasswordReset
+vi.mock('next/headers', () => ({
+  headers: vi.fn(() => Promise.resolve({
+    get: vi.fn(() => 'http://localhost:3000'),
   })),
 }))
 
@@ -750,6 +761,173 @@ describe('logout', () => {
       mockSignOut.mockRejectedValueOnce(new Error('Network error'))
 
       const result = await logout()
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe('SERVER_ERROR')
+        expect(result.error).toBe('Une erreur inattendue s\'est produite')
+      }
+    })
+  })
+})
+
+// ============================================
+// requestPasswordReset Tests
+// ============================================
+
+describe('requestPasswordReset', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  describe('successful reset request', () => {
+    it('returns success when email is sent', async () => {
+      mockResetPasswordForEmail.mockResolvedValueOnce({
+        error: null,
+      })
+
+      const result = await requestPasswordReset('test@example.com')
+
+      expect(result.success).toBe(true)
+      expect(mockResetPasswordForEmail).toHaveBeenCalledWith(
+        'test@example.com',
+        expect.objectContaining({
+          redirectTo: expect.stringContaining('/reset-password'),
+        })
+      )
+    })
+
+    it('returns success even when email does not exist (security)', async () => {
+      mockResetPasswordForEmail.mockResolvedValueOnce({
+        error: { message: 'User not found' },
+      })
+
+      const result = await requestPasswordReset('nonexistent@example.com')
+
+      // SECURITY: Toujours retourner success pour éviter l'énumération
+      expect(result.success).toBe(true)
+    })
+
+    it('returns success on exception (security)', async () => {
+      mockResetPasswordForEmail.mockRejectedValueOnce(new Error('Unexpected'))
+
+      const result = await requestPasswordReset('test@example.com')
+
+      // SECURITY: Toujours retourner success
+      expect(result.success).toBe(true)
+    })
+  })
+
+  describe('validation', () => {
+    it('returns success for invalid email (security - no enumeration)', async () => {
+      const result = await requestPasswordReset('invalid-email')
+
+      // SECURITY: Même pour email invalide, on retourne success
+      expect(result.success).toBe(true)
+      // Et on n'appelle pas Supabase
+      expect(mockResetPasswordForEmail).not.toHaveBeenCalled()
+    })
+
+    it('returns success for empty email (security - no enumeration)', async () => {
+      const result = await requestPasswordReset('')
+
+      expect(result.success).toBe(true)
+      expect(mockResetPasswordForEmail).not.toHaveBeenCalled()
+    })
+  })
+})
+
+// ============================================
+// updatePassword Tests
+// ============================================
+
+describe('updatePassword', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  describe('successful update', () => {
+    it('returns success when password is updated', async () => {
+      mockUpdateUser.mockResolvedValueOnce({
+        error: null,
+      })
+
+      const result = await updatePassword('newPassword123')
+
+      expect(result.success).toBe(true)
+      expect(mockUpdateUser).toHaveBeenCalledWith({ password: 'newPassword123' })
+    })
+  })
+
+  describe('validation', () => {
+    it('returns validation error for short password', async () => {
+      const result = await updatePassword('short')
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe('VALIDATION_ERROR')
+        expect(result.error).toContain('8 caractères')
+      }
+      expect(mockUpdateUser).not.toHaveBeenCalled()
+    })
+
+    it('returns validation error for empty password', async () => {
+      const result = await updatePassword('')
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe('VALIDATION_ERROR')
+      }
+      expect(mockUpdateUser).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('error handling', () => {
+    it('returns unauthorized when session is missing', async () => {
+      mockUpdateUser.mockResolvedValueOnce({
+        error: { message: 'Auth session missing' },
+      })
+
+      const result = await updatePassword('newPassword123')
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe('UNAUTHORIZED')
+        expect(result.error).toContain('Lien expiré ou invalide')
+      }
+    })
+
+    it('returns unauthorized for not authenticated error', async () => {
+      mockUpdateUser.mockResolvedValueOnce({
+        error: { message: 'User not authenticated' },
+      })
+
+      const result = await updatePassword('newPassword123')
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe('UNAUTHORIZED')
+      }
+    })
+
+    it('returns server error for generic error', async () => {
+      mockUpdateUser.mockResolvedValueOnce({
+        error: { message: 'Some other error' },
+      })
+
+      const result = await updatePassword('newPassword123')
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe('SERVER_ERROR')
+        expect(result.error).toBe('Une erreur est survenue lors de la modification du mot de passe')
+      }
+    })
+
+    it('handles unexpected exceptions', async () => {
+      mockUpdateUser.mockRejectedValueOnce(new Error('Network error'))
+
+      const result = await updatePassword('newPassword123')
 
       expect(result.success).toBe(false)
       if (!result.success) {

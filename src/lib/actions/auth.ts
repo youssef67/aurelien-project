@@ -1,5 +1,6 @@
 'use server'
 
+import { headers } from 'next/headers'
 import { z } from 'zod'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import {
@@ -11,6 +12,16 @@ import {
   type LoginInput,
 } from '@/lib/validations/auth'
 import type { ActionResult } from '@/types/api'
+
+// Schéma Zod pour la demande de réinitialisation de mot de passe
+const requestPasswordResetSchema = z.object({
+  email: z.string().email('Veuillez saisir un email valide'),
+})
+
+// Schéma Zod pour la mise à jour du mot de passe
+const updatePasswordSchema = z.object({
+  password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
+})
 
 export async function registerSupplier(
   input: RegisterSupplierServerInput
@@ -291,6 +302,93 @@ export async function logout(): Promise<ActionResult<void>> {
       return {
         success: false,
         error: 'Une erreur est survenue lors de la déconnexion',
+        code: 'SERVER_ERROR'
+      }
+    }
+
+    return {
+      success: true,
+      data: undefined
+    }
+  } catch {
+    return {
+      success: false,
+      error: 'Une erreur inattendue s\'est produite',
+      code: 'SERVER_ERROR'
+    }
+  }
+}
+
+export async function requestPasswordReset(
+  email: string
+): Promise<ActionResult<void>> {
+  // Validation serveur avec schéma Zod
+  const validated = requestPasswordResetSchema.safeParse({ email })
+  if (!validated.success) {
+    // SECURITY: Toujours retourner success pour éviter l'énumération d'emails
+    return {
+      success: true,
+      data: undefined
+    }
+  }
+
+  try {
+    const supabase = await createClient()
+    const headersList = await headers()
+    const origin = headersList.get('origin') || 'http://localhost:3000'
+
+    await supabase.auth.resetPasswordForEmail(validated.data.email, {
+      redirectTo: `${origin}/reset-password`,
+    })
+
+    // SECURITY: Toujours retourner success pour éviter l'énumération d'emails
+    // Même si l'email n'existe pas ou si une erreur survient, on ne révèle pas cette information
+    return {
+      success: true,
+      data: undefined
+    }
+  } catch {
+    // SECURITY: Toujours retourner success
+    return {
+      success: true,
+      data: undefined
+    }
+  }
+}
+
+export async function updatePassword(
+  password: string
+): Promise<ActionResult<void>> {
+  // Validation serveur avec schéma Zod
+  const validated = updatePasswordSchema.safeParse({ password })
+  if (!validated.success) {
+    const issues = JSON.parse(validated.error.message)
+    return {
+      success: false,
+      error: issues[0]?.message || 'Le mot de passe doit contenir au moins 8 caractères',
+      code: 'VALIDATION_ERROR'
+    }
+  }
+
+  try {
+    const supabase = await createClient()
+
+    const { error } = await supabase.auth.updateUser({ password: validated.data.password })
+
+    if (error) {
+      // Gérer les cas d'erreur spécifiques
+      if (error.message.includes('Auth session missing') ||
+          error.message.includes('session') ||
+          error.message.includes('not authenticated')) {
+        return {
+          success: false,
+          error: 'Lien expiré ou invalide. Veuillez demander un nouveau lien.',
+          code: 'UNAUTHORIZED'
+        }
+      }
+      return {
+        success: false,
+        error: 'Une erreur est survenue lors de la modification du mot de passe',
         code: 'SERVER_ERROR'
       }
     }

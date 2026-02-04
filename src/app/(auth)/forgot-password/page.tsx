@@ -1,29 +1,35 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
+
+import { ForgotPasswordForm } from '@/components/forms/forgot-password-form'
 
 export const metadata: Metadata = {
   title: 'Mot de passe oublié - Aurelien Project',
+  description: 'Réinitialisez votre mot de passe pour accéder à votre compte',
 }
 
 export default function ForgotPasswordPage() {
   return (
-    <div className="w-full max-w-sm space-y-6">
+    <div className="w-full max-w-md space-y-6">
       <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-bold">Mot de passe oublié</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Mot de passe oublié
+        </h1>
         <p className="text-muted-foreground">
-          Entrez votre email pour réinitialiser votre mot de passe
+          Entrez votre adresse email pour recevoir un lien de réinitialisation.
         </p>
       </div>
 
-      <div className="space-y-4">
-        <p className="text-sm text-muted-foreground text-center">
-          Formulaire de réinitialisation (à implémenter)
-        </p>
-      </div>
+      <ForgotPasswordForm />
 
-      <div className="text-center text-sm">
-        <Link href="/login" className="text-primary hover:underline">
-          ← Retour à la connexion
+      <div className="text-center">
+        <Link
+          href="/login"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-primary"
+        >
+          <ArrowLeft className="mr-2 size-4" />
+          Retour à la connexion
         </Link>
       </div>
     </div>
