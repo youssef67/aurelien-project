@@ -48,7 +48,7 @@ development_status:
   1-4-inscription-fournisseur: done
   1-5-inscription-magasin: done
   1-6-connexion-utilisateur: done
-  1-7-deconnexion-utilisateur: backlog
+  1-7-deconnexion-utilisateur: done
   1-8-reinitialisation-mot-de-passe: backlog
   1-9-landing-page-publique: ready-for-dev
   epic-1-retrospective: optional

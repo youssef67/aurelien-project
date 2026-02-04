@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { registerSupplier, registerStore, login, resendConfirmationEmail } from './auth'
+import { registerSupplier, registerStore, login, logout, resendConfirmationEmail } from './auth'
 
 // Mock Supabase
 const mockSignUp = vi.fn()
 const mockSignInWithPassword = vi.fn()
+const mockSignOut = vi.fn()
 const mockResend = vi.fn()
 const mockInsert = vi.fn()
 const mockFrom = vi.fn(() => ({ insert: mockInsert }))
@@ -14,6 +15,7 @@ vi.mock('@/lib/supabase/server', () => ({
     auth: {
       signUp: mockSignUp,
       signInWithPassword: mockSignInWithPassword,
+      signOut: mockSignOut,
       resend: mockResend,
     },
   })),
@@ -699,6 +701,60 @@ describe('resendConfirmationEmail', () => {
       expect(result.success).toBe(false)
       if (!result.success) {
         expect(result.code).toBe('SERVER_ERROR')
+      }
+    })
+  })
+})
+
+// ============================================
+// logout Tests
+// ============================================
+
+describe('logout', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  describe('successful logout', () => {
+    it('returns success when signOut succeeds', async () => {
+      mockSignOut.mockResolvedValueOnce({
+        error: null,
+      })
+
+      const result = await logout()
+
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data).toBeUndefined()
+      }
+      expect(mockSignOut).toHaveBeenCalled()
+    })
+  })
+
+  describe('error handling', () => {
+    it('returns error when signOut fails', async () => {
+      mockSignOut.mockResolvedValueOnce({
+        error: { message: 'Sign out error' },
+      })
+
+      const result = await logout()
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe('SERVER_ERROR')
+        expect(result.error).toBe('Une erreur est survenue lors de la déconnexion')
+      }
+    })
+
+    it('handles unexpected exceptions', async () => {
+      mockSignOut.mockRejectedValueOnce(new Error('Network error'))
+
+      const result = await logout()
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe('SERVER_ERROR')
+        expect(result.error).toBe('Une erreur inattendue s\'est produite')
       }
     })
   })

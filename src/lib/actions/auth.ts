@@ -281,6 +281,33 @@ export async function login(
   }
 }
 
+export async function logout(): Promise<ActionResult<void>> {
+  try {
+    const supabase = await createClient()
+
+    const { error } = await supabase.auth.signOut()
+
+    if (error) {
+      return {
+        success: false,
+        error: 'Une erreur est survenue lors de la déconnexion',
+        code: 'SERVER_ERROR'
+      }
+    }
+
+    return {
+      success: true,
+      data: undefined
+    }
+  } catch {
+    return {
+      success: false,
+      error: 'Une erreur inattendue s\'est produite',
+      code: 'SERVER_ERROR'
+    }
+  }
+}
+
 export async function resendConfirmationEmail(
   email: string
 ): Promise<ActionResult<void>> {
