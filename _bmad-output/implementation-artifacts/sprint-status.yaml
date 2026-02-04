@@ -44,12 +44,13 @@ development_status:
   epic-1: in-progress
   1-1-initialisation-du-projet: done
   1-2-fondation-design-system: done
-  1-3-schema-base-de-donnees-et-configuration-auth: backlog
-  1-4-inscription-fournisseur: backlog
-  1-5-inscription-magasin: backlog
+  1-3-schema-base-de-donnees-et-configuration-auth: done
+  1-4-inscription-fournisseur: done
+  1-5-inscription-magasin: ready-for-dev
   1-6-connexion-utilisateur: backlog
   1-7-deconnexion-utilisateur: backlog
   1-8-reinitialisation-mot-de-passe: backlog
+  1-9-landing-page-publique: ready-for-dev
   epic-1-retrospective: optional
 
   # ============================================

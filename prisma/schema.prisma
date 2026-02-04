@@ -13,3 +13,41 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
+// Enum pour les enseignes de magasins
+enum Brand {
+  LECLERC
+  INTERMARCHE
+  SUPER_U
+  SYSTEME_U
+
+  @@map("brand")
+}
+
+// Modèle Fournisseur
+model Supplier {
+  id          String   @id @default(uuid()) @db.Uuid
+  email       String   @unique
+  companyName String   @map("company_name")
+  phone       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("suppliers")
+  // Note: @unique already creates an index, no need for separate @@index
+}
+
+// Modèle Magasin
+model Store {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  name      String
+  brand     Brand
+  city      String
+  phone     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("stores")
+  // Note: @unique already creates an index, no need for separate @@index
+}

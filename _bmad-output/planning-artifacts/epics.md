@@ -495,6 +495,36 @@ Afin de récupérer l'accès à mon compte.
 
 ---
 
+### Story 1.9: Landing Page Publique
+
+En tant que visiteur non connecté,
+Je veux voir une page d'accueil qui présente l'application et me guide vers l'inscription ou la connexion,
+Afin de comprendre la valeur de l'application et choisir comment y accéder.
+
+**Acceptance Criteria:**
+
+**Given** je ne suis pas connecté
+**When** j'accède à la racine de l'application `/`
+**Then** une page d'accueil attractive s'affiche avec la proposition de valeur
+**And** un bouton "Créer un compte" mène vers `/register`
+**And** un lien "Déjà inscrit ? Se connecter" mène vers `/login`
+
+**Given** je suis déjà connecté en tant que fournisseur
+**When** j'accède à `/`
+**Then** je suis automatiquement redirigé vers `/dashboard`
+
+**Given** je suis déjà connecté en tant que magasin
+**When** j'accède à `/`
+**Then** je suis automatiquement redirigé vers `/offers`
+
+**Given** je visualise la landing page sur mobile
+**When** l'écran fait entre 320px et 767px
+**Then** le contenu est lisible et les CTAs font minimum 44x44px
+
+**Références:** Support FR1, FR2, FR3, NFR1, NFR18, UX-01, UX-02, UX-10
+
+---
+
 ## Epic 2: Gestion des Offres Fournisseur
 
 Un fournisseur peut publier, modifier et gérer ses offres promotionnelles avec toutes les informations nécessaires (nom, prix, remise, dates, catégorie, photo, marge, conditions).
