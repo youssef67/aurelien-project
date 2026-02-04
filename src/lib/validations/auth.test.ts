@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { registerSupplierSchema, registerStoreSchema, BrandEnum, BRAND_LABELS } from './auth'
+import { registerSupplierSchema, registerStoreSchema, BrandEnum, BRAND_LABELS, loginSchema } from './auth'
 
 describe('registerSupplierSchema', () => {
   describe('valid inputs', () => {
@@ -371,5 +371,80 @@ describe('BRAND_LABELS', () => {
     expect(BRAND_LABELS.INTERMARCHE).toBe('Intermarché')
     expect(BRAND_LABELS.SUPER_U).toBe('Super U')
     expect(BRAND_LABELS.SYSTEME_U).toBe('Système U')
+  })
+})
+
+// ============================================
+// Login Schema Tests
+// ============================================
+
+describe('loginSchema', () => {
+  describe('valid inputs', () => {
+    it('accepts valid credentials', () => {
+      const result = loginSchema.safeParse({
+        email: 'test@example.com',
+        password: 'password123',
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts email with various valid formats', () => {
+      const validEmails = [
+        'user@domain.com',
+        'user.name@domain.fr',
+        'user+tag@company.co.uk',
+      ]
+      validEmails.forEach(email => {
+        const result = loginSchema.safeParse({
+          email,
+          password: 'password123',
+        })
+        expect(result.success).toBe(true)
+      })
+    })
+  })
+
+  describe('email validation', () => {
+    it('rejects invalid email format', () => {
+      const result = loginSchema.safeParse({
+        email: 'invalid-email',
+        password: 'password123',
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        const issues = JSON.parse(result.error.message)
+        expect(issues[0]?.message).toContain('email valide')
+      }
+    })
+
+    it('rejects empty email', () => {
+      const result = loginSchema.safeParse({
+        email: '',
+        password: 'password123',
+      })
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('password validation', () => {
+    it('rejects empty password', () => {
+      const result = loginSchema.safeParse({
+        email: 'test@example.com',
+        password: '',
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        const issues = JSON.parse(result.error.message)
+        expect(issues[0]?.message).toContain('requis')
+      }
+    })
+
+    it('accepts any non-empty password (no min length for login)', () => {
+      const result = loginSchema.safeParse({
+        email: 'test@example.com',
+        password: 'a',
+      })
+      expect(result.success).toBe(true)
+    })
   })
 })

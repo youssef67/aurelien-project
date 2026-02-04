@@ -104,3 +104,18 @@ export type RegisterSupplierInput = z.infer<typeof registerSupplierSchema>
 export const registerSupplierServerSchema = baseSupplierSchema
 
 export type RegisterSupplierServerInput = z.infer<typeof registerSupplierServerSchema>
+
+// ============================================
+// Login Schema
+// ============================================
+
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .email('Veuillez entrer une adresse email valide'),
+  password: z
+    .string()
+    .min(1, 'Le mot de passe est requis'),
+})
+
+export type LoginInput = z.infer<typeof loginSchema>

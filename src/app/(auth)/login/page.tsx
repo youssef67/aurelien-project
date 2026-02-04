@@ -1,40 +1,60 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { CheckCircle2 } from 'lucide-react'
+
+import { LoginForm } from '@/components/forms/login-form'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export const metadata: Metadata = {
   title: 'Connexion - Aurelien Project',
+  description: 'Connectez-vous à votre compte pour accéder à votre espace personnel',
 }
 
-export default function LoginPage() {
+interface LoginPageProps {
+  searchParams: Promise<{ registered?: string }>
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = await searchParams
+  const justRegistered = params.registered === 'true'
+
   return (
-    <div className="w-full max-w-sm space-y-6">
+    <div className="w-full max-w-md space-y-6">
       <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-bold">Connexion</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Connexion
+        </h1>
         <p className="text-muted-foreground">
-          Connectez-vous à votre compte
+          Entrez vos identifiants pour accéder à votre espace
         </p>
       </div>
 
-      <div className="space-y-4">
-        <p className="text-sm text-muted-foreground text-center">
-          Formulaire de connexion (à implémenter)
-        </p>
+      {justRegistered && (
+        <Alert className="border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200">
+          <CheckCircle2 className="size-4 text-green-600 dark:text-green-400" />
+          <AlertDescription>
+            Compte créé avec succès ! Vérifiez votre email pour confirmer votre inscription.
+          </AlertDescription>
+        </Alert>
+      )}
 
-        <div className="text-center text-sm">
+      <LoginForm />
+
+      <div className="space-y-2 text-center text-sm">
+        <p>
           <Link
             href="/forgot-password"
-            className="text-primary hover:underline"
+            className="text-muted-foreground hover:text-primary hover:underline"
           >
             Mot de passe oublié ?
           </Link>
-        </div>
-
-        <div className="text-center text-sm">
+        </p>
+        <p className="text-muted-foreground">
           Pas encore de compte ?{' '}
           <Link href="/register" className="text-primary hover:underline">
-            S&apos;inscrire
+            Inscrivez-vous
           </Link>
-        </div>
+        </p>
       </div>
     </div>
   )
