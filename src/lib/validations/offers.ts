@@ -50,9 +50,48 @@ export const createOfferStep2Schema = z.object({
   }),
 })
 
+// Étape 3: Détails (optionnel)
+const SUBCATEGORY_MAX = 100
+const VOLUME_MAX = 255
+const TEXT_FIELD_MAX = 1000
+const MARGIN_MIN = 0.01
+const MARGIN_MAX = 99.99
+
+export const createOfferStep3Schema = z.object({
+  subcategory: z
+    .string()
+    .max(SUBCATEGORY_MAX, `La sous-catégorie ne peut pas dépasser ${SUBCATEGORY_MAX} caractères`)
+    .optional()
+    .or(z.literal('')),
+  margin: z
+    .number()
+    .min(MARGIN_MIN, `La marge doit être d'au moins ${MARGIN_MIN}%`)
+    .max(MARGIN_MAX, `La marge ne peut pas dépasser ${MARGIN_MAX}%`)
+    .multipleOf(0.01, 'La marge doit avoir maximum 2 décimales')
+    .optional()
+    .nullable(),
+  volume: z
+    .string()
+    .max(VOLUME_MAX, `Le volume ne peut pas dépasser ${VOLUME_MAX} caractères`)
+    .optional()
+    .or(z.literal('')),
+  conditions: z
+    .string()
+    .max(TEXT_FIELD_MAX, `Les conditions ne peuvent pas dépasser ${TEXT_FIELD_MAX} caractères`)
+    .optional()
+    .or(z.literal('')),
+  animation: z
+    .string()
+    .max(TEXT_FIELD_MAX, `L'animation ne peut pas dépasser ${TEXT_FIELD_MAX} caractères`)
+    .optional()
+    .or(z.literal('')),
+  photoUrl: z.string().url().optional().nullable().or(z.literal('')),
+})
+
 // Schéma complet pour la Server Action (merge + refinement)
 export const createOfferSchema = createOfferStep1Schema
   .merge(createOfferStep2Schema)
+  .merge(createOfferStep3Schema)
   .refine(
     (data) => {
       const start = new Date(data.startDate)
@@ -69,4 +108,5 @@ export const createOfferSchema = createOfferStep1Schema
 
 export type CreateOfferStep1Input = z.infer<typeof createOfferStep1Schema>
 export type CreateOfferStep2Input = z.infer<typeof createOfferStep2Schema>
+export type CreateOfferStep3Input = z.infer<typeof createOfferStep3Schema>
 export type CreateOfferInput = z.infer<typeof createOfferSchema>

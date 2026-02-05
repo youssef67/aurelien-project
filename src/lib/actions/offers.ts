@@ -39,7 +39,10 @@ export async function createOffer(
     }
 
     // 4. Créer l'offre — supplierId TOUJOURS depuis auth, JAMAIS depuis input
-    const { name, promoPrice, discountPercent, startDate, endDate, category } = validated.data
+    const {
+      name, promoPrice, discountPercent, startDate, endDate, category,
+      subcategory, margin, volume, conditions, animation, photoUrl,
+    } = validated.data
 
     const offer = await prisma.offer.create({
       data: {
@@ -51,6 +54,12 @@ export async function createOffer(
         endDate: new Date(endDate),
         category,
         status: 'ACTIVE',
+        subcategory: subcategory || undefined,
+        margin: margin ?? undefined,
+        volume: volume || undefined,
+        conditions: conditions || undefined,
+        animation: animation || undefined,
+        photoUrl: photoUrl || undefined,
       },
     })
 

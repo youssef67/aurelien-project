@@ -59,7 +59,7 @@ development_status:
   epic-2: in-progress
   2-1-schema-offres-et-page-liste-vide: done
   2-2-creation-offre-champs-obligatoires: done
-  2-3-enrichissement-offre-champs-optionnels: backlog
+  2-3-enrichissement-offre-champs-optionnels: done
   2-4-liste-des-offres-fournisseur: backlog
   2-5-modification-offre: backlog
   2-6-suppression-offre: backlog

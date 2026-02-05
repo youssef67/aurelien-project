@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   createOfferStep1Schema,
   createOfferStep2Schema,
+  createOfferStep3Schema,
   createOfferSchema,
   OFFER_CATEGORIES,
   OFFER_CATEGORY_LABELS,
@@ -262,6 +263,183 @@ describe('createOfferSchema', () => {
         expect(endDateIssue?.message).toContain('après la date de début')
       }
     })
+  })
+})
+
+// ============================================
+// Step 3 Schema: Détails (optionnel)
+// ============================================
+
+describe('createOfferStep3Schema', () => {
+  it('accepts all fields empty (everything optional)', () => {
+    const result = createOfferStep3Schema.safeParse({})
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts all fields with valid values', () => {
+    const result = createOfferStep3Schema.safeParse({
+      subcategory: 'Bio',
+      margin: 15.5,
+      volume: '2 palettes',
+      conditions: 'Franco à partir de 500€',
+      animation: 'PLV tête de gondole fournie',
+      photoUrl: 'https://example.com/photo.jpg',
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts empty strings (treated as optional)', () => {
+    const result = createOfferStep3Schema.safeParse({
+      subcategory: '',
+      volume: '',
+      conditions: '',
+      animation: '',
+      photoUrl: '',
+    })
+    expect(result.success).toBe(true)
+  })
+
+  describe('subcategory validation', () => {
+    it('accepts subcategory up to 100 characters', () => {
+      const result = createOfferStep3Schema.safeParse({ subcategory: 'A'.repeat(100) })
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects subcategory over 100 characters', () => {
+      const result = createOfferStep3Schema.safeParse({ subcategory: 'A'.repeat(101) })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        const issues = JSON.parse(result.error.message)
+        expect(issues[0]?.message).toContain('100')
+      }
+    })
+  })
+
+  describe('margin validation', () => {
+    it('accepts margin at minimum (0.01)', () => {
+      const result = createOfferStep3Schema.safeParse({ margin: 0.01 })
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts margin at maximum (99.99)', () => {
+      const result = createOfferStep3Schema.safeParse({ margin: 99.99 })
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects margin below 0.01', () => {
+      const result = createOfferStep3Schema.safeParse({ margin: 0 })
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects margin above 99.99', () => {
+      const result = createOfferStep3Schema.safeParse({ margin: 100 })
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects margin with more than 2 decimals', () => {
+      const result = createOfferStep3Schema.safeParse({ margin: 15.555 })
+      expect(result.success).toBe(false)
+    })
+
+    it('accepts null margin', () => {
+      const result = createOfferStep3Schema.safeParse({ margin: null })
+      expect(result.success).toBe(true)
+    })
+  })
+
+  describe('volume validation', () => {
+    it('accepts volume up to 255 characters', () => {
+      const result = createOfferStep3Schema.safeParse({ volume: 'A'.repeat(255) })
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects volume over 255 characters', () => {
+      const result = createOfferStep3Schema.safeParse({ volume: 'A'.repeat(256) })
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('conditions validation', () => {
+    it('accepts conditions up to 1000 characters', () => {
+      const result = createOfferStep3Schema.safeParse({ conditions: 'A'.repeat(1000) })
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects conditions over 1000 characters', () => {
+      const result = createOfferStep3Schema.safeParse({ conditions: 'A'.repeat(1001) })
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('animation validation', () => {
+    it('accepts animation up to 1000 characters', () => {
+      const result = createOfferStep3Schema.safeParse({ animation: 'A'.repeat(1000) })
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects animation over 1000 characters', () => {
+      const result = createOfferStep3Schema.safeParse({ animation: 'A'.repeat(1001) })
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('photoUrl validation', () => {
+    it('accepts valid URL', () => {
+      const result = createOfferStep3Schema.safeParse({ photoUrl: 'https://storage.example.com/photo.jpg' })
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts null photoUrl', () => {
+      const result = createOfferStep3Schema.safeParse({ photoUrl: null })
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects invalid URL', () => {
+      const result = createOfferStep3Schema.safeParse({ photoUrl: 'not-a-url' })
+      expect(result.success).toBe(false)
+    })
+  })
+})
+
+// ============================================
+// Complete Schema with Step 3 (optional)
+// ============================================
+
+describe('createOfferSchema with step 3', () => {
+  const validInput: CreateOfferInput = {
+    name: 'Nutella 1kg',
+    promoPrice: 12.99,
+    discountPercent: 25,
+    startDate: futureDate(1),
+    endDate: futureDate(10),
+    category: 'EPICERIE',
+  }
+
+  it('accepts complete data without step 3 fields (backward compat)', () => {
+    const result = createOfferSchema.safeParse(validInput)
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts complete data with all step 3 fields', () => {
+    const result = createOfferSchema.safeParse({
+      ...validInput,
+      subcategory: 'Bio',
+      margin: 15.5,
+      volume: '2 palettes',
+      conditions: 'Franco 500€',
+      animation: 'PLV tête de gondole',
+      photoUrl: 'https://example.com/photo.jpg',
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts complete data with only some step 3 fields', () => {
+    const result = createOfferSchema.safeParse({
+      ...validInput,
+      subcategory: 'Bio',
+      margin: 15.5,
+    })
+    expect(result.success).toBe(true)
   })
 })
 

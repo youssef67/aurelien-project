@@ -199,6 +199,85 @@ describe('createOffer', () => {
     })
   })
 
+  describe('optional fields (step 3)', () => {
+    const userId = 'supplier-uuid-123'
+
+    beforeEach(() => {
+      mockGetUser.mockResolvedValue({
+        data: { user: { id: userId } },
+      })
+      mockSupplierFindUnique.mockResolvedValue({ id: userId })
+      mockOfferCreate.mockResolvedValue({ id: 'offer-uuid-789' })
+    })
+
+    it('creates offer with optional fields when provided', async () => {
+      const input = {
+        ...validInput(),
+        subcategory: 'Bio',
+        margin: 15.5,
+        volume: '2 palettes',
+        conditions: 'Franco 500€',
+        animation: 'PLV tête de gondole',
+        photoUrl: 'https://example.com/photo.jpg',
+      }
+
+      const result = await createOffer(input)
+
+      expect(result.success).toBe(true)
+      expect(mockOfferCreate).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          subcategory: 'Bio',
+          margin: 15.5,
+          volume: '2 palettes',
+          conditions: 'Franco 500€',
+          animation: 'PLV tête de gondole',
+          photoUrl: 'https://example.com/photo.jpg',
+        }),
+      })
+    })
+
+    it('creates offer without optional fields (backward compat)', async () => {
+      const result = await createOffer(validInput())
+
+      expect(result.success).toBe(true)
+      expect(mockOfferCreate).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          name: 'Nutella 1kg',
+          supplierId: userId,
+        }),
+      })
+      // Optional fields should not be set (undefined → Prisma ignores them)
+      const callData = mockOfferCreate.mock.calls[0][0].data
+      expect(callData.subcategory).toBeUndefined()
+      expect(callData.margin).toBeUndefined()
+      expect(callData.volume).toBeUndefined()
+      expect(callData.conditions).toBeUndefined()
+      expect(callData.animation).toBeUndefined()
+      expect(callData.photoUrl).toBeUndefined()
+    })
+
+    it('transforms empty strings to undefined', async () => {
+      const input = {
+        ...validInput(),
+        subcategory: '',
+        volume: '',
+        conditions: '',
+        animation: '',
+        photoUrl: '',
+      }
+
+      const result = await createOffer(input)
+
+      expect(result.success).toBe(true)
+      const callData = mockOfferCreate.mock.calls[0][0].data
+      expect(callData.subcategory).toBeUndefined()
+      expect(callData.volume).toBeUndefined()
+      expect(callData.conditions).toBeUndefined()
+      expect(callData.animation).toBeUndefined()
+      expect(callData.photoUrl).toBeUndefined()
+    })
+  })
+
   describe('error handling', () => {
     it('returns SERVER_ERROR on database failure', async () => {
       const userId = 'supplier-uuid-123'

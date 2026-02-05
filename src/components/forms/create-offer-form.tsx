@@ -9,6 +9,7 @@ import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Form,
   FormControl,
@@ -25,6 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { StepIndicator } from '@/components/custom/step-indicator'
+import { PhotoUpload } from '@/components/custom/photo-upload'
 import {
   createOfferSchema,
   createOfferStep1Schema,
@@ -36,9 +38,13 @@ import {
 import { createOffer } from '@/lib/actions/offers'
 
 const DRAFT_KEY = 'create-offer-draft'
-const STEP_LABELS = ['Produit & Prix', 'Dates & Catégorie']
+const STEP_LABELS = ['Produit & Prix', 'Dates & Catégorie', 'Détails (optionnel)']
 
-export function CreateOfferForm() {
+interface CreateOfferFormProps {
+  supplierId?: string
+}
+
+export function CreateOfferForm({ supplierId = '' }: CreateOfferFormProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -53,6 +59,12 @@ export function CreateOfferForm() {
       startDate: '',
       endDate: '',
       category: undefined as unknown as (typeof OFFER_CATEGORIES)[number],
+      subcategory: '',
+      margin: undefined,
+      volume: '',
+      conditions: '',
+      animation: '',
+      photoUrl: '',
     },
   })
 
@@ -62,6 +74,8 @@ export function CreateOfferForm() {
     if (draft) {
       try {
         const parsed = JSON.parse(draft)
+        // Ne pas restaurer photoUrl (trop volatile)
+        delete parsed.photoUrl
         form.reset(parsed)
       } catch {
         /* ignore invalid draft */
@@ -69,10 +83,12 @@ export function CreateOfferForm() {
     }
   }, [form])
 
-  // Sauvegarder brouillon à chaque changement
+  // Sauvegarder brouillon à chaque changement (sauf photoUrl)
   useEffect(() => {
     const subscription = form.watch((values) => {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(values))
+      const draftValues = { ...values }
+      delete draftValues.photoUrl
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draftValues))
     })
     return () => subscription.unsubscribe()
   }, [form])
@@ -80,22 +96,30 @@ export function CreateOfferForm() {
   // Validation par étape avant de passer à la suivante
   async function handleNext() {
     const values = form.getValues()
-    const stepSchema = currentStep === 1 ? createOfferStep1Schema : createOfferStep2Schema
-    const stepFields =
-      currentStep === 1
-        ? { name: values.name, promoPrice: values.promoPrice, discountPercent: values.discountPercent }
-        : { startDate: values.startDate, endDate: values.endDate, category: values.category }
 
-    const result = stepSchema.safeParse(stepFields)
-    if (!result.success) {
-      // Trigger validation errors on current step fields
-      const fieldNames = Object.keys(stepFields) as (keyof CreateOfferInput)[]
-      for (const field of fieldNames) {
-        await form.trigger(field)
+    if (currentStep === 1) {
+      const stepFields = { name: values.name, promoPrice: values.promoPrice, discountPercent: values.discountPercent }
+      const result = createOfferStep1Schema.safeParse(stepFields)
+      if (!result.success) {
+        const fieldNames = Object.keys(stepFields) as (keyof CreateOfferInput)[]
+        for (const field of fieldNames) {
+          await form.trigger(field)
+        }
+        return
       }
-      return
+    } else if (currentStep === 2) {
+      const stepFields = { startDate: values.startDate, endDate: values.endDate, category: values.category }
+      const result = createOfferStep2Schema.safeParse(stepFields)
+      if (!result.success) {
+        const fieldNames = Object.keys(stepFields) as (keyof CreateOfferInput)[]
+        for (const field of fieldNames) {
+          await form.trigger(field)
+        }
+        return
+      }
     }
-    setCurrentStep((prev) => prev + 1)
+    // Step 3 has no blocking validation (all optional)
+    setCurrentStep((prev) => Math.min(prev + 1, 3))
   }
 
   async function onSubmit(data: CreateOfferInput) {
@@ -119,7 +143,7 @@ export function CreateOfferForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <StepIndicator currentStep={currentStep} totalSteps={2} labels={STEP_LABELS} />
+        <StepIndicator currentStep={currentStep} totalSteps={3} labels={STEP_LABELS} />
 
         {/* Étape 1: Produit & Prix */}
         {currentStep === 1 && (
@@ -242,6 +266,106 @@ export function CreateOfferForm() {
           </div>
         )}
 
+        {/* Étape 3: Détails (optionnel) */}
+        {currentStep === 3 && (
+          <div className="space-y-4">
+            <PhotoUpload
+              value={form.watch('photoUrl') || null}
+              onChange={(url) => form.setValue('photoUrl', url ?? '')}
+              supplierId={supplierId}
+            />
+
+            <FormField
+              control={form.control}
+              name="subcategory"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Sous-catégorie</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex: Bio, Sans gluten" maxLength={100} {...field} value={field.value ?? ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="margin"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Marge proposée (%)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0.01"
+                      max="99.99"
+                      placeholder="15.50"
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                      value={field.value ?? ''}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="volume"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Volume estimé</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex: 2 palettes, 50 colis" maxLength={255} {...field} value={field.value ?? ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="conditions"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Conditions commerciales</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Ex: Franco à partir de 500€"
+                      maxLength={1000}
+                      {...field}
+                      value={field.value ?? ''}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="animation"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Animation prévue</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Ex: PLV tête de gondole fournie"
+                      maxLength={1000}
+                      {...field}
+                      value={field.value ?? ''}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
+
         {/* Navigation buttons */}
         <div className="flex gap-3">
           {currentStep > 1 && (
@@ -256,12 +380,33 @@ export function CreateOfferForm() {
             </Button>
           )}
 
-          {currentStep < 2 ? (
+          {currentStep === 1 && (
             <Button type="button" className="flex-1 h-11" onClick={handleNext}>
               Suivant
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-          ) : (
+          )}
+
+          {currentStep === 2 && (
+            <>
+              <Button type="submit" variant="outline" className="flex-1 h-11" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Publication...
+                  </>
+                ) : (
+                  "Publier l'offre"
+                )}
+              </Button>
+              <Button type="button" className="flex-1 h-11" onClick={handleNext}>
+                Enrichir
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </>
+          )}
+
+          {currentStep === 3 && (
             <Button type="submit" className="flex-1 h-11" disabled={isLoading}>
               {isLoading ? (
                 <>
