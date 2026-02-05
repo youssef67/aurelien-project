@@ -50,15 +50,15 @@ development_status:
   1-6-connexion-utilisateur: done
   1-7-deconnexion-utilisateur: done
   1-8-reinitialisation-mot-de-passe: done
-  1-9-landing-page-publique: ready-for-dev
+  1-9-landing-page-publique: done
   epic-1-retrospective: optional
 
   # ============================================
   # Epic 2: Gestion des Offres Fournisseur
   # ============================================
-  epic-2: backlog
-  2-1-schema-offres-et-page-liste-vide: backlog
-  2-2-creation-offre-champs-obligatoires: backlog
+  epic-2: in-progress
+  2-1-schema-offres-et-page-liste-vide: done
+  2-2-creation-offre-champs-obligatoires: done
   2-3-enrichissement-offre-champs-optionnels: backlog
   2-4-liste-des-offres-fournisseur: backlog
   2-5-modification-offre: backlog
