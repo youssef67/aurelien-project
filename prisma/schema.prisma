@@ -14,6 +14,27 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// Enum pour les catégories d'offres
+enum OfferCategory {
+  EPICERIE
+  FRAIS
+  DPH
+  SURGELES
+  BOISSONS
+  AUTRES
+
+  @@map("offer_category")
+}
+
+// Enum pour le statut des offres
+enum OfferStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
+
+  @@map("offer_status")
+}
+
 // Enum pour les enseignes de magasins
 enum Brand {
   LECLERC
@@ -33,8 +54,42 @@ model Supplier {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
+  // Relations
+  offers Offer[]
+
   @@map("suppliers")
   // Note: @unique already creates an index, no need for separate @@index
+}
+
+// Modèle Offre
+model Offer {
+  id              String        @id @default(uuid()) @db.Uuid
+  supplierId      String        @map("supplier_id") @db.Uuid
+  name            String
+  promoPrice      Decimal       @map("promo_price") @db.Decimal(10, 2)
+  discountPercent Int           @map("discount_percent")
+  startDate       DateTime      @map("start_date") @db.Date
+  endDate         DateTime      @map("end_date") @db.Date
+  category        OfferCategory
+  subcategory     String?
+  photoUrl        String?       @map("photo_url")
+  margin          Decimal?      @db.Decimal(5, 2)
+  volume          String?
+  conditions      String?       @db.Text
+  animation       String?       @db.Text
+  status          OfferStatus   @default(DRAFT)
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  deletedAt       DateTime?     @map("deleted_at")
+
+  // Relations
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([supplierId])
+  @@index([status, startDate, endDate])
+
+  @@map("offers")
 }
 
 // Modèle Magasin

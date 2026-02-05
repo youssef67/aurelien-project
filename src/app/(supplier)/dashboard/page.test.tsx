@@ -1,0 +1,119 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen } from '@testing-library/react'
+
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: vi.fn(),
+}))
+
+vi.mock('@/lib/prisma/client', () => ({
+  prisma: {
+    offer: {
+      findMany: vi.fn(),
+    },
+  },
+}))
+
+vi.mock('next/navigation', () => ({
+  redirect: vi.fn(() => {
+    throw new Error('NEXT_REDIRECT')
+  }),
+  useRouter: vi.fn(() => ({
+    back: vi.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
+  })),
+  usePathname: vi.fn(() => '/dashboard'),
+}))
+
+import { createClient } from '@/lib/supabase/server'
+import { prisma } from '@/lib/prisma/client'
+import { redirect } from 'next/navigation'
+import DashboardPage from './page'
+
+describe('DashboardPage', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('redirects to login when user is not authenticated', async () => {
+    vi.mocked(createClient).mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: null } }),
+      },
+    } as never)
+
+    await expect(DashboardPage()).rejects.toThrow('NEXT_REDIRECT')
+    expect(redirect).toHaveBeenCalledWith('/login')
+  })
+
+  it('renders empty state when user has no offers', async () => {
+    vi.mocked(createClient).mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } } }),
+      },
+    } as never)
+    vi.mocked(prisma.offer.findMany).mockResolvedValue([])
+
+    // Prevent redirect mock from throwing for this test
+    vi.mocked(redirect).mockImplementation(() => {
+      throw new Error('NEXT_REDIRECT')
+    })
+
+    const result = await DashboardPage()
+    render(result as React.ReactElement)
+
+    expect(screen.getByText('Aucune offre pour le moment')).toBeInTheDocument()
+  })
+
+  it('renders offer list placeholder when offers exist', async () => {
+    vi.mocked(createClient).mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } } }),
+      },
+    } as never)
+    vi.mocked(prisma.offer.findMany).mockResolvedValue([
+      { id: '1', name: 'Test Offer' } as never,
+    ])
+
+    const result = await DashboardPage()
+    render(result as React.ReactElement)
+
+    expect(screen.getByText(/Story 2\.4/)).toBeInTheDocument()
+  })
+
+  it('queries only non-deleted offers for the current user', async () => {
+    vi.mocked(createClient).mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-123' } } }),
+      },
+    } as never)
+    vi.mocked(prisma.offer.findMany).mockResolvedValue([])
+
+    await DashboardPage()
+
+    expect(prisma.offer.findMany).toHaveBeenCalledWith({
+      where: {
+        supplierId: 'user-123',
+        deletedAt: null,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+  })
+
+  it('renders the FloatingActionButton linking to /offers/new', async () => {
+    vi.mocked(createClient).mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } } }),
+      },
+    } as never)
+    vi.mocked(prisma.offer.findMany).mockResolvedValue([])
+
+    const result = await DashboardPage()
+    render(result as React.ReactElement)
+
+    const fabLink = screen.getByRole('link', { name: /créer une nouvelle offre/i })
+    expect(fabLink).toHaveAttribute('href', '/offers/new')
+  })
+})

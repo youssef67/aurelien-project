@@ -51,9 +51,9 @@ export async function middleware(request: NextRequest) {
   // Permettre les routes publiques
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
   if (isPublicRoute) {
-    // Si déjà connecté et sur une page auth, rediriger vers /offers
+    // Si déjà connecté et sur une page auth, rediriger vers /dashboard
     if (user && (pathname === '/login' || pathname.startsWith('/register'))) {
-      return NextResponse.redirect(new URL('/offers', request.url))
+      return NextResponse.redirect(new URL('/profile', request.url))
     }
     return supabaseResponse
   }

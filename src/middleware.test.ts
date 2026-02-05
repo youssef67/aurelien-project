@@ -148,7 +148,7 @@ describe('Middleware', () => {
   })
 
   describe('Authenticated user on auth pages', () => {
-    it('should redirect authenticated user from login to /offers', async () => {
+    it('should redirect authenticated user from login to /profile', async () => {
       const mockUser = { id: '123', email: 'test@test.com' }
       const mockSupabase = {
         auth: {
@@ -161,10 +161,10 @@ describe('Middleware', () => {
       const response = await middleware(request)
 
       expect(response.status).toBe(307)
-      expect(response.headers.get('location')).toContain('/offers')
+      expect(response.headers.get('location')).toContain('/profile')
     })
 
-    it('should redirect authenticated user from register to /offers', async () => {
+    it('should redirect authenticated user from register to /profile', async () => {
       const mockUser = { id: '123', email: 'test@test.com' }
       const mockSupabase = {
         auth: {
@@ -177,7 +177,7 @@ describe('Middleware', () => {
       const response = await middleware(request)
 
       expect(response.status).toBe(307)
-      expect(response.headers.get('location')).toContain('/offers')
+      expect(response.headers.get('location')).toContain('/profile')
     })
   })
 

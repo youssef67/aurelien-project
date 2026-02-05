@@ -1,18 +1,32 @@
-/**
- * Supplier Route Group Layout
- *
- * This layout wraps all supplier-specific routes.
- * Currently a pass-through - MobileLayout with bottom nav is handled per-page.
- *
- * Future enhancements (Story 1.4+):
- * - Role-based access control (verify user is supplier)
- * - Supplier-specific navigation
- * - Supplier context provider
- */
-export default function SupplierLayout({
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { prisma } from '@/lib/prisma/client'
+import { MobileLayout } from '@/components/layout/mobile-layout'
+import { SupplierBottomNavigation } from '@/components/custom/supplier-bottom-navigation'
+
+export default async function SupplierLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return <>{children}</>
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  const supplier = await prisma.supplier.findUnique({
+    where: { id: user.id },
+  })
+
+  if (!supplier) {
+    redirect('/profile')
+  }
+
+  return (
+    <MobileLayout bottomNav={<SupplierBottomNavigation />}>
+      {children}
+    </MobileLayout>
+  )
 }

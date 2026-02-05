@@ -4,12 +4,14 @@ interface MobileLayoutProps {
   children: React.ReactNode
   header?: React.ReactNode
   showBottomNav?: boolean
+  bottomNav?: React.ReactNode
 }
 
 export function MobileLayout({
   children,
   header,
   showBottomNav = true,
+  bottomNav,
 }: MobileLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -19,7 +21,7 @@ export function MobileLayout({
         </header>
       )}
       <main className="flex-1 overflow-auto pb-16">{children}</main>
-      {showBottomNav && <BottomNavigation />}
+      {showBottomNav && (bottomNav ?? <BottomNavigation />)}
     </div>
   )
 }
