@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma/client'
 import { PageHeader } from '@/components/layout/page-header'
 import { EmptyOffersState } from '@/components/custom/empty-offers-state'
 import { FloatingActionButton } from '@/components/custom/floating-action-button'
+import { OfferList } from '@/components/custom/offer-list'
+import { serializeOffer } from '@/lib/utils/offers'
 
 export const metadata: Metadata = {
   title: 'Mes offres - aurelien-project',
@@ -37,7 +39,7 @@ export default async function DashboardPage() {
         {offers.length === 0 ? (
           <EmptyOffersState />
         ) : (
-          <div>Liste des offres à implémenter (Story 2.4)</div>
+          <OfferList offers={offers.map(serializeOffer)} />
         )}
       </div>
 

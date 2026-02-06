@@ -25,6 +25,7 @@ vi.mock('next/navigation', () => ({
   usePathname: vi.fn(() => '/dashboard'),
 }))
 
+import { Decimal } from '@prisma/client/runtime/library'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma/client'
 import { redirect } from 'next/navigation'
@@ -65,20 +66,41 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Aucune offre pour le moment')).toBeInTheDocument()
   })
 
-  it('renders offer list placeholder when offers exist', async () => {
+  it('renders offer list when offers exist', async () => {
     vi.mocked(createClient).mockResolvedValue({
       auth: {
         getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } } }),
       },
     } as never)
     vi.mocked(prisma.offer.findMany).mockResolvedValue([
-      { id: '1', name: 'Test Offer' } as never,
+      {
+        id: '1',
+        supplierId: 'user-1',
+        name: 'Test Offer',
+        promoPrice: new Decimal('9.99'),
+        discountPercent: 20,
+        startDate: new Date('2026-02-01'),
+        endDate: new Date('2099-12-31'),
+        category: 'FRUITS_LEGUMES',
+        subcategory: null,
+        photoUrl: null,
+        margin: null,
+        volume: null,
+        conditions: null,
+        animation: null,
+        status: 'ACTIVE',
+        createdAt: new Date('2026-01-01'),
+        updatedAt: new Date('2026-01-01'),
+        deletedAt: null,
+      } as never,
     ])
 
     const result = await DashboardPage()
     render(result as React.ReactElement)
 
-    expect(screen.getByText(/Story 2\.4/)).toBeInTheDocument()
+    expect(screen.getByText('Test Offer')).toBeInTheDocument()
+    expect(screen.getByText(/9,99/)).toBeInTheDocument()
+    expect(screen.getByText(/-20%/)).toBeInTheDocument()
   })
 
   it('queries only non-deleted offers for the current user', async () => {
