@@ -16,7 +16,7 @@ export function MobileLayout({
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {header && (
-        <header className="sticky top-0 z-50 bg-background border-b border-border">
+        <header className="sticky top-0 z-50 bg-background shadow-[0_1px_7px_rgba(0,0,0,0.08)]">
           {header}
         </header>
       )}

@@ -38,7 +38,7 @@ export function PageHeader({
             <ChevronLeft className="h-6 w-6" />
           </button>
         )}
-        <h1 className="text-xl font-semibold">{title}</h1>
+        <h1 className="font-display text-xl font-bold">{title}</h1>
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>

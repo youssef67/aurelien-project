@@ -110,3 +110,24 @@ export type CreateOfferStep1Input = z.infer<typeof createOfferStep1Schema>
 export type CreateOfferStep2Input = z.infer<typeof createOfferStep2Schema>
 export type CreateOfferStep3Input = z.infer<typeof createOfferStep3Schema>
 export type CreateOfferInput = z.infer<typeof createOfferSchema>
+
+// Schéma pour la mise à jour d'offre (pas de refinement startDate >= today)
+export const updateOfferSchema = createOfferStep1Schema
+  .merge(createOfferStep2Schema)
+  .merge(createOfferStep3Schema)
+  .extend({
+    id: z.string().uuid('ID offre invalide'),
+  })
+  .refine(
+    (data) => new Date(data.endDate) >= new Date(data.startDate),
+    { message: 'La date de fin doit être après la date de début', path: ['endDate'] }
+  )
+
+export type UpdateOfferInput = z.infer<typeof updateOfferSchema>
+
+// Schéma pour la suppression d'offre
+export const deleteOfferSchema = z.object({
+  id: z.string().uuid('ID offre invalide'),
+})
+
+export type DeleteOfferInput = z.infer<typeof deleteOfferSchema>

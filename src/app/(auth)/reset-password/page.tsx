@@ -23,7 +23,7 @@ export default async function ResetPasswordPage() {
   return (
     <div className="w-full max-w-md space-y-6">
       <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">
+        <h1 className="font-display text-2xl font-bold tracking-tight">
           {isValidSession ? 'Nouveau mot de passe' : 'Lien invalide'}
         </h1>
         {isValidSession && (

@@ -9,7 +9,7 @@ export function EmptyOffersState() {
         <Package className="h-12 w-12 text-muted-foreground" />
       </div>
 
-      <h2 className="text-xl font-semibold mb-2">
+      <h2 className="font-display text-lg font-semibold mb-2">
         Aucune offre pour le moment
       </h2>
 

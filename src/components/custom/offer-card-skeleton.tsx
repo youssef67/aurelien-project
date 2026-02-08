@@ -5,7 +5,7 @@ export function OfferCardSkeleton() {
   return (
     <Card>
       <CardContent className="flex gap-3 p-3">
-        <Skeleton className="h-20 w-20 flex-shrink-0 rounded-lg" />
+        <Skeleton className="h-20 w-20 flex-shrink-0 rounded-[0_0.75rem_0_0]" />
         <div className="flex flex-1 flex-col justify-between">
           <div className="flex items-start justify-between gap-2">
             <Skeleton className="h-4 w-32" />

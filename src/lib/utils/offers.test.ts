@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { getOfferDisplayStatus, serializeOffer } from './offers'
+import { getOfferDisplayStatus, serializeOffer, getCategoryLabel, isNewOffer, serializeOfferWithSupplier } from './offers'
 import type { Offer } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
+import type { OfferWithSupplier } from '@/lib/queries/offers'
 
 function createMockOffer(overrides: Partial<Offer> = {}): Offer {
   return {
@@ -12,7 +13,7 @@ function createMockOffer(overrides: Partial<Offer> = {}): Offer {
     discountPercent: 25,
     startDate: new Date('2026-02-01'),
     endDate: new Date('2026-12-31'),
-    category: 'FRUITS_LEGUMES',
+    category: 'EPICERIE',
     subcategory: null,
     photoUrl: null,
     margin: null,
@@ -143,5 +144,141 @@ describe('serializeOffer', () => {
     expect(result.name).toBe('My Offer')
     expect(result.discountPercent).toBe(30)
     expect(result.id).toBe('test-id')
+  })
+})
+
+describe('getCategoryLabel', () => {
+  it('returns "Épicerie" for EPICERIE', () => {
+    expect(getCategoryLabel('EPICERIE')).toBe('Épicerie')
+  })
+
+  it('returns "Frais" for FRAIS', () => {
+    expect(getCategoryLabel('FRAIS')).toBe('Frais')
+  })
+
+  it('returns "DPH" for DPH', () => {
+    expect(getCategoryLabel('DPH')).toBe('DPH')
+  })
+
+  it('returns "Surgelés" for SURGELES', () => {
+    expect(getCategoryLabel('SURGELES')).toBe('Surgelés')
+  })
+
+  it('returns "Boissons" for BOISSONS', () => {
+    expect(getCategoryLabel('BOISSONS')).toBe('Boissons')
+  })
+
+  it('returns "Autres" for AUTRES', () => {
+    expect(getCategoryLabel('AUTRES')).toBe('Autres')
+  })
+
+  it('returns the raw value for unknown category', () => {
+    expect(getCategoryLabel('UNKNOWN')).toBe('UNKNOWN')
+  })
+})
+
+describe('isNewOffer', () => {
+  it('returns true for offer created just now', () => {
+    expect(isNewOffer(new Date())).toBe(true)
+  })
+
+  it('returns true for offer created 1 hour ago', () => {
+    const oneHourAgo = new Date()
+    oneHourAgo.setHours(oneHourAgo.getHours() - 1)
+    expect(isNewOffer(oneHourAgo)).toBe(true)
+  })
+
+  it('returns false for offer created 3 days ago', () => {
+    const threeDaysAgo = new Date()
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3)
+    expect(isNewOffer(threeDaysAgo)).toBe(false)
+  })
+
+  it('returns false for offer created exactly 49 hours ago', () => {
+    const fortyNineHoursAgo = new Date()
+    fortyNineHoursAgo.setHours(fortyNineHoursAgo.getHours() - 49)
+    expect(isNewOffer(fortyNineHoursAgo)).toBe(false)
+  })
+
+  it('accepts string date input', () => {
+    const recentDate = new Date()
+    recentDate.setHours(recentDate.getHours() - 1)
+    expect(isNewOffer(recentDate.toISOString())).toBe(true)
+  })
+
+  it('returns true for offer created 47 hours ago', () => {
+    const fortySevenHoursAgo = new Date()
+    fortySevenHoursAgo.setHours(fortySevenHoursAgo.getHours() - 47)
+    expect(isNewOffer(fortySevenHoursAgo)).toBe(true)
+  })
+
+  it('returns false for offer created exactly 48 hours ago (boundary)', () => {
+    const exactly48h = new Date()
+    exactly48h.setHours(exactly48h.getHours() - 48)
+    expect(isNewOffer(exactly48h)).toBe(false)
+  })
+})
+
+describe('serializeOfferWithSupplier', () => {
+  function createOfferWithSupplier(overrides: Partial<OfferWithSupplier> = {}): OfferWithSupplier {
+    return {
+      id: 'test-id',
+      supplierId: 'supplier-id',
+      name: 'Test Offer',
+      promoPrice: new Decimal('12.99'),
+      discountPercent: 25,
+      startDate: new Date('2026-02-01'),
+      endDate: new Date('2026-12-31'),
+      category: 'EPICERIE',
+      subcategory: null,
+      photoUrl: null,
+      margin: null,
+      volume: null,
+      conditions: null,
+      animation: null,
+      status: 'ACTIVE',
+      createdAt: new Date('2026-01-01'),
+      updatedAt: new Date('2026-01-01'),
+      deletedAt: null,
+      supplier: { companyName: 'Test Supplier' },
+      ...overrides,
+    } as OfferWithSupplier
+  }
+
+  it('converts promoPrice Decimal to number', () => {
+    const result = serializeOfferWithSupplier(createOfferWithSupplier())
+
+    expect(result.promoPrice).toBe(12.99)
+    expect(typeof result.promoPrice).toBe('number')
+  })
+
+  it('converts Date fields to ISO strings', () => {
+    const result = serializeOfferWithSupplier(createOfferWithSupplier())
+
+    expect(typeof result.startDate).toBe('string')
+    expect(typeof result.endDate).toBe('string')
+    expect(typeof result.createdAt).toBe('string')
+  })
+
+  it('includes supplier.companyName', () => {
+    const result = serializeOfferWithSupplier(createOfferWithSupplier())
+
+    expect(result.supplier.companyName).toBe('Test Supplier')
+  })
+
+  it('preserves id, name, category, discountPercent', () => {
+    const result = serializeOfferWithSupplier(createOfferWithSupplier())
+
+    expect(result.id).toBe('test-id')
+    expect(result.name).toBe('Test Offer')
+    expect(result.category).toBe('EPICERIE')
+    expect(result.discountPercent).toBe(25)
+  })
+
+  it('preserves null photoUrl and subcategory', () => {
+    const result = serializeOfferWithSupplier(createOfferWithSupplier())
+
+    expect(result.photoUrl).toBeNull()
+    expect(result.subcategory).toBeNull()
   })
 })

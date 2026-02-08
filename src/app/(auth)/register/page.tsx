@@ -9,7 +9,7 @@ export default function RegisterPage() {
   return (
     <div className="w-full max-w-sm space-y-6">
       <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-bold">Inscription</h1>
+        <h1 className="font-display text-2xl font-bold">Inscription</h1>
         <p className="text-muted-foreground">
           Choisissez votre type de compte
         </p>
@@ -18,9 +18,9 @@ export default function RegisterPage() {
       <div className="space-y-4">
         <Link
           href="/register/supplier"
-          className="block w-full p-4 border rounded-lg hover:bg-accent transition-colors"
+          className="block w-full p-4 border rounded-[0_1rem_1rem_1rem] hover:bg-accent transition-colors"
         >
-          <h2 className="font-semibold">Fournisseur</h2>
+          <h2 className="font-display font-semibold">Fournisseur</h2>
           <p className="text-sm text-muted-foreground">
             Je propose des offres promotionnelles
           </p>
@@ -28,9 +28,9 @@ export default function RegisterPage() {
 
         <Link
           href="/register/store"
-          className="block w-full p-4 border rounded-lg hover:bg-accent transition-colors"
+          className="block w-full p-4 border rounded-[0_1rem_1rem_1rem] hover:bg-accent transition-colors"
         >
-          <h2 className="font-semibold">Magasin</h2>
+          <h2 className="font-display font-semibold">Magasin</h2>
           <p className="text-sm text-muted-foreground">
             Je recherche des offres pour mon magasin
           </p>

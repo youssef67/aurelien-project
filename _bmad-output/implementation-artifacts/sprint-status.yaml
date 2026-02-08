@@ -61,16 +61,16 @@ development_status:
   2-2-creation-offre-champs-obligatoires: done
   2-3-enrichissement-offre-champs-optionnels: done
   2-4-liste-des-offres-fournisseur: done
-  2-5-modification-offre: backlog
-  2-6-suppression-offre: backlog
+  2-5-modification-offre: done
+  2-6-suppression-offre: done
   epic-2-retrospective: optional
 
   # ============================================
   # Epic 3: Découverte des Offres Magasin
   # ============================================
-  epic-3: backlog
-  3-1-liste-des-offres-disponibles: backlog
-  3-2-filtrage-par-categorie: backlog
+  epic-3: in-progress
+  3-1-liste-des-offres-disponibles: done
+  3-2-filtrage-par-categorie: done
   3-3-filtrage-par-date-et-fournisseur: backlog
   3-4-filtrage-par-enseigne-compatible: backlog
   3-5-detail-complet-offre: backlog

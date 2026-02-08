@@ -21,13 +21,12 @@ export function OfferCard({ offer }: OfferCardProps) {
       <article
         aria-labelledby={`offer-${offer.id}-title`}
         className={cn(
-          'transition-shadow hover:shadow-md',
-          isExpired && 'opacity-60'
+          isExpired && 'opacity-50'
         )}
       >
-        <Card>
+        <Card className="transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(37,34,74,0.08)]">
           <CardContent className="flex gap-3 p-3">
-            <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
+            <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-[0_0.75rem_0_0] bg-muted">
               {offer.photoUrl ? (
                 <Image
                   src={offer.photoUrl}
@@ -48,7 +47,7 @@ export function OfferCard({ offer }: OfferCardProps) {
                 <div className="flex items-start justify-between gap-2">
                   <h3
                     id={`offer-${offer.id}-title`}
-                    className="text-lg font-semibold leading-tight truncate"
+                    className="font-display text-lg font-semibold leading-tight truncate"
                   >
                     {offer.name}
                   </h3>

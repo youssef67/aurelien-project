@@ -13,10 +13,11 @@ const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 interface PhotoUploadProps {
   value?: string | null
   onChange: (url: string | null) => void
+  onDelete?: (url: string) => Promise<void>
   supplierId: string
 }
 
-export function PhotoUpload({ value, onChange, supplierId }: PhotoUploadProps) {
+export function PhotoUpload({ value, onChange, onDelete, supplierId }: PhotoUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -53,7 +54,11 @@ export function PhotoUpload({ value, onChange, supplierId }: PhotoUploadProps) {
   async function handleDelete() {
     if (!value) return
     try {
-      await deleteOfferPhoto(value)
+      if (onDelete) {
+        await onDelete(value)
+      } else {
+        await deleteOfferPhoto(value)
+      }
       onChange(null)
     } catch {
       toast.error('Erreur lors de la suppression de la photo')
@@ -63,7 +68,7 @@ export function PhotoUpload({ value, onChange, supplierId }: PhotoUploadProps) {
   return (
     <div className="space-y-2">
       {value ? (
-        <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
+        <div className="relative aspect-video w-full overflow-hidden rounded-[0_1rem_1rem_1rem] border">
           {/* eslint-disable-next-line @next/next/no-img-element -- Dynamic external URL from Supabase Storage */}
           <img src={value} alt="Photo du produit" className="h-full w-full object-cover" />
           <Button
@@ -83,7 +88,7 @@ export function PhotoUpload({ value, onChange, supplierId }: PhotoUploadProps) {
           onClick={() => inputRef.current?.click()}
           disabled={isUploading}
           className={cn(
-            'flex aspect-video w-full flex-col items-center justify-center rounded-lg border-2 border-dashed',
+            'flex aspect-video w-full flex-col items-center justify-center rounded-[0_1rem_1rem_1rem] border-2 border-dashed',
             'transition-colors hover:border-primary hover:bg-muted/50',
             isUploading && 'pointer-events-none opacity-50'
           )}

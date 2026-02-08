@@ -4,11 +4,15 @@ import {
   createOfferStep2Schema,
   createOfferStep3Schema,
   createOfferSchema,
+  updateOfferSchema,
+  deleteOfferSchema,
   OFFER_CATEGORIES,
   OFFER_CATEGORY_LABELS,
   type CreateOfferStep1Input,
   type CreateOfferStep2Input,
   type CreateOfferInput,
+  type UpdateOfferInput,
+  type DeleteOfferInput,
 } from './offers'
 
 // Helper: date en string ISO format YYYY-MM-DD
@@ -469,5 +473,179 @@ describe('OFFER_CATEGORY_LABELS', () => {
     expect(OFFER_CATEGORY_LABELS.SURGELES).toBe('Surgelés')
     expect(OFFER_CATEGORY_LABELS.BOISSONS).toBe('Boissons')
     expect(OFFER_CATEGORY_LABELS.AUTRES).toBe('Autres')
+  })
+})
+
+// ============================================
+// updateOfferSchema
+// ============================================
+
+describe('updateOfferSchema', () => {
+  const validUpdateInput: UpdateOfferInput = {
+    id: '550e8400-e29b-41d4-a716-446655440000',
+    name: 'Nutella 1kg',
+    promoPrice: 12.99,
+    discountPercent: 25,
+    startDate: futureDate(1),
+    endDate: futureDate(10),
+    category: 'EPICERIE',
+  }
+
+  describe('valid inputs', () => {
+    it('accepts complete valid data with UUID id', () => {
+      const result = updateOfferSchema.safeParse(validUpdateInput)
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts startDate in the past (offre en cours)', () => {
+      const result = updateOfferSchema.safeParse({
+        ...validUpdateInput,
+        startDate: pastDate(5),
+        endDate: futureDate(10),
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts endDate equal to startDate', () => {
+      const start = futureDate(1)
+      const result = updateOfferSchema.safeParse({
+        ...validUpdateInput,
+        startDate: start,
+        endDate: start,
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts data with all optional step 3 fields', () => {
+      const result = updateOfferSchema.safeParse({
+        ...validUpdateInput,
+        subcategory: 'Bio',
+        margin: 15.5,
+        volume: '2 palettes',
+        conditions: 'Franco 500€',
+        animation: 'PLV fournie',
+        photoUrl: 'https://example.com/photo.jpg',
+      })
+      expect(result.success).toBe(true)
+    })
+  })
+
+  describe('id validation', () => {
+    it('rejects invalid UUID', () => {
+      const result = updateOfferSchema.safeParse({
+        ...validUpdateInput,
+        id: 'not-a-uuid',
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        const issues = JSON.parse(result.error.message)
+        expect(issues[0]?.message).toContain('ID offre invalide')
+      }
+    })
+
+    it('rejects empty id', () => {
+      const result = updateOfferSchema.safeParse({
+        ...validUpdateInput,
+        id: '',
+      })
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('date validation', () => {
+    it('rejects endDate before startDate', () => {
+      const result = updateOfferSchema.safeParse({
+        ...validUpdateInput,
+        startDate: futureDate(10),
+        endDate: futureDate(5),
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        const issues = JSON.parse(result.error.message)
+        const endDateIssue = issues.find((i: { path: string[] }) => i.path?.includes('endDate'))
+        expect(endDateIssue?.message).toContain('après la date de début')
+      }
+    })
+
+    it('does NOT reject startDate in the past (unlike createOfferSchema)', () => {
+      const result = updateOfferSchema.safeParse({
+        ...validUpdateInput,
+        startDate: pastDate(10),
+        endDate: futureDate(10),
+      })
+      expect(result.success).toBe(true)
+    })
+  })
+
+  describe('field validation (same as create)', () => {
+    it('rejects empty name', () => {
+      const result = updateOfferSchema.safeParse({
+        ...validUpdateInput,
+        name: '',
+      })
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects negative price', () => {
+      const result = updateOfferSchema.safeParse({
+        ...validUpdateInput,
+        promoPrice: -5,
+      })
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects discount above 99', () => {
+      const result = updateOfferSchema.safeParse({
+        ...validUpdateInput,
+        discountPercent: 100,
+      })
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects invalid category', () => {
+      const result = updateOfferSchema.safeParse({
+        ...validUpdateInput,
+        category: 'INVALID',
+      })
+      expect(result.success).toBe(false)
+    })
+  })
+})
+
+// ============================================
+// deleteOfferSchema
+// ============================================
+
+describe('deleteOfferSchema', () => {
+  const validDeleteInput: DeleteOfferInput = {
+    id: '550e8400-e29b-41d4-a716-446655440000',
+  }
+
+  describe('valid inputs', () => {
+    it('accepts valid UUID id', () => {
+      const result = deleteOfferSchema.safeParse(validDeleteInput)
+      expect(result.success).toBe(true)
+    })
+  })
+
+  describe('id validation', () => {
+    it('rejects invalid UUID', () => {
+      const result = deleteOfferSchema.safeParse({ id: 'not-a-uuid' })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        const issues = JSON.parse(result.error.message)
+        expect(issues[0]?.message).toContain('ID offre invalide')
+      }
+    })
+
+    it('rejects empty id', () => {
+      const result = deleteOfferSchema.safeParse({ id: '' })
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects missing id', () => {
+      const result = deleteOfferSchema.safeParse({})
+      expect(result.success).toBe(false)
+    })
   })
 })

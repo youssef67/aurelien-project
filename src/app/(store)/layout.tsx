@@ -1,18 +1,32 @@
-/**
- * Store Route Group Layout
- *
- * This layout wraps all store-specific routes.
- * Currently a pass-through - MobileLayout with bottom nav is handled per-page.
- *
- * Future enhancements (Story 1.5+):
- * - Role-based access control (verify user is store)
- * - Store-specific navigation
- * - Store context provider
- */
-export default function StoreLayout({
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { prisma } from '@/lib/prisma/client'
+import { MobileLayout } from '@/components/layout/mobile-layout'
+import { BottomNavigation } from '@/components/custom/bottom-navigation'
+
+export default async function StoreLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return <>{children}</>
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  const store = await prisma.store.findUnique({
+    where: { id: user.id },
+  })
+
+  if (!store) {
+    redirect('/')
+  }
+
+  return (
+    <MobileLayout bottomNav={<BottomNavigation />}>
+      {children}
+    </MobileLayout>
+  )
 }

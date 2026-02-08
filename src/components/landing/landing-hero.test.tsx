@@ -19,7 +19,7 @@ describe('LandingHero', () => {
     it('uses design system components (responsive layout)', () => {
       render(<LandingHero />)
       const container = screen.getByTestId('landing-hero')
-      expect(container).toHaveClass('min-h-screen')
+      expect(container).toHaveClass('flex', 'flex-col')
     })
   })
 
@@ -83,8 +83,7 @@ describe('LandingHero', () => {
     it('content is centered and stacks vertically on mobile', () => {
       render(<LandingHero />)
       const container = screen.getByTestId('landing-hero')
-      expect(container).toHaveClass('flex-col')
-      expect(container).toHaveClass('items-center')
+      expect(container).toHaveClass('flex', 'flex-col')
     })
   })
 

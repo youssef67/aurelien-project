@@ -73,7 +73,7 @@ describe('OfferCard', () => {
 
     expect(screen.getByText('Expirée')).toBeInTheDocument()
     const article = screen.getByRole('article')
-    expect(article).toHaveClass('opacity-60')
+    expect(article).toHaveClass('opacity-50')
   })
 
   it('renders Brouillon badge for draft offer', () => {

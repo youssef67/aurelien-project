@@ -35,7 +35,7 @@ export default async function DashboardPage() {
     <>
       <PageHeader title="Mes offres" />
 
-      <div className="flex-1 overflow-auto p-4">
+      <div className="flex-1 overflow-auto p-4 bg-muted">
         {offers.length === 0 ? (
           <EmptyOffersState />
         ) : (
