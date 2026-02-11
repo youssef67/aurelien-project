@@ -1,6 +1,6 @@
 'use client'
 
-import { useSyncExternalStore, useMemo, useTransition, useCallback, useState } from 'react'
+import { useSyncExternalStore, useMemo, useTransition, useCallback, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { RefreshCw, PackageSearch, SlidersHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -124,10 +124,16 @@ export function StoreOfferList({ offers, storeBrand }: StoreOfferListProps) {
   const [isPending, startTransition] = useTransition()
   const [sheetOpen, setSheetOpen] = useState(false)
 
+  const [hydrated, setHydrated] = useState(false)
+  useEffect(() => setHydrated(true), [])
+
   const selectedCategory = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
   const dateFilter = useSyncExternalStore(subscribeDateFilter, getDateFilterSnapshot, getDateFilterServerSnapshot)
   const supplierFilter = useSyncExternalStore(subscribeSupplierFilter, getSupplierFilterSnapshot, getSupplierFilterServerSnapshot)
   const brandFilter = useSyncExternalStore(subscribeBrandFilter, getBrandFilterSnapshot, getBrandFilterServerSnapshot)
+
+  // Avoid SSR flash: don't apply any category until client has hydrated
+  const effectiveCategory = hydrated ? selectedCategory : undefined
 
   const storeBrandLabel = storeBrand ? BRAND_LABELS[storeBrand as BrandType] : undefined
 
@@ -225,9 +231,9 @@ export function StoreOfferList({ offers, storeBrand }: StoreOfferListProps) {
 
   // 3. Category filtering on already-filtered offers
   const filteredOffers = useMemo(() => {
-    if (!selectedCategory) return advancedFilteredOffers
-    return advancedFilteredOffers.filter((o) => o.category === selectedCategory)
-  }, [advancedFilteredOffers, selectedCategory])
+    if (!effectiveCategory) return advancedFilteredOffers
+    return advancedFilteredOffers.filter((o) => o.category === effectiveCategory)
+  }, [advancedFilteredOffers, effectiveCategory])
 
   const activeFilterCount =
     (dateFilter !== 'all' ? 1 : 0) +
@@ -248,7 +254,7 @@ export function StoreOfferList({ offers, storeBrand }: StoreOfferListProps) {
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <div className="flex-1 min-w-0">
             <CategoryFilterChips
-              selectedCategory={selectedCategory}
+              selectedCategory={effectiveCategory}
               onCategoryChange={handleCategoryChange}
               categoryCounts={categoryCounts}
               totalCount={advancedFilteredOffers.length}
@@ -280,7 +286,13 @@ export function StoreOfferList({ offers, storeBrand }: StoreOfferListProps) {
         </Button>
       </div>
 
-      {filteredOffers.length === 0 ? (
+      {!hydrated ? (
+        <div className="space-y-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-24 rounded-[0_16px_16px_16px] bg-secondary animate-pulse" />
+          ))}
+        </div>
+      ) : filteredOffers.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <PackageSearch className="h-12 w-12 text-muted-foreground/50 mb-3" />
           <p className="font-display text-base font-semibold text-foreground mb-1">

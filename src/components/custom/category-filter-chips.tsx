@@ -14,7 +14,7 @@ const CATEGORIES: OfferCategory[] = [
 ]
 
 interface CategoryFilterChipsProps {
-  selectedCategory: string | null
+  selectedCategory: string | null | undefined
   onCategoryChange: (category: string | null) => void
   categoryCounts: Record<string, number>
   totalCount: number
