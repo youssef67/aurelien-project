@@ -14,6 +14,22 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// Enum pour le type de demande
+enum RequestType {
+  INFO
+  ORDER
+
+  @@map("request_type")
+}
+
+// Enum pour le statut de demande
+enum RequestStatus {
+  PENDING
+  TREATED
+
+  @@map("request_status")
+}
+
 // Enum pour les catégories d'offres
 enum OfferCategory {
   EPICERIE
@@ -55,7 +71,8 @@ model Supplier {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
-  offers Offer[]
+  offers   Offer[]
+  requests Request[]
 
   @@map("suppliers")
   // Note: @unique already creates an index, no need for separate @@index
@@ -83,7 +100,8 @@ model Offer {
   deletedAt       DateTime?     @map("deleted_at")
 
   // Relations
-  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  supplier Supplier  @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  requests Request[]
 
   // Indexes
   @@index([supplierId])
@@ -103,6 +121,69 @@ model Store {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  // Relations
+  requests Request[]
+
   @@map("stores")
   // Note: @unique already creates an index, no need for separate @@index
+}
+
+// Enum pour le type de notification
+enum NotificationType {
+  NEW_REQUEST
+  REQUEST_TREATED
+
+  @@map("notification_type")
+}
+
+// Enum pour le type d'utilisateur (notification)
+enum UserType {
+  SUPPLIER
+  STORE
+
+  @@map("user_type")
+}
+
+// Modèle Notification
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @map("user_id") @db.Uuid
+  userType  UserType         @map("user_type")
+  type      NotificationType
+  title     String
+  body      String           @db.Text
+  relatedId String?          @map("related_id") @db.Uuid
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  @@index([userId, userType, read])
+  @@map("notifications")
+}
+
+// Modèle Demande
+model Request {
+  id         String        @id @default(uuid()) @db.Uuid
+  storeId    String        @map("store_id") @db.Uuid
+  offerId    String        @map("offer_id") @db.Uuid
+  supplierId String        @map("supplier_id") @db.Uuid
+  type       RequestType
+  message    String?       @db.Text
+  status     RequestStatus @default(PENDING)
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  store    Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  offer    Offer    @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([offerId])
+  @@index([supplierId])
+
+  // Unique constraint: un magasin ne peut envoyer qu'une demande par type par offre
+  @@unique([storeId, offerId, type])
+
+  @@map("requests")
 }

@@ -16,7 +16,7 @@ export function getOfferDisplayStatus(offer: { status: Offer['status']; endDate:
   const endDate = new Date(offer.endDate)
   endDate.setHours(0, 0, 0, 0)
 
-  if (endDate < today) {
+  if (endDate < today || offer.status === 'EXPIRED') {
     return { key: 'expired', label: 'Expirée', variant: 'secondary' }
   }
 

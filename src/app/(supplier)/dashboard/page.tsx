@@ -43,7 +43,7 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      <FloatingActionButton href="/offers/new" />
+      <FloatingActionButton href="/my-offers/new" />
     </>
   )
 }

@@ -17,7 +17,7 @@ export function OfferCard({ offer }: OfferCardProps) {
   const isExpired = displayStatus.key === 'expired'
 
   return (
-    <Link href={`/offers/${offer.id}`}>
+    <Link href={`/my-offers/${offer.id}`}>
       <article
         aria-labelledby={`offer-${offer.id}-title`}
         className={cn(

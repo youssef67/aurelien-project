@@ -18,7 +18,7 @@ export function EmptyOffersState() {
       </p>
 
       <Button asChild className="h-11">
-        <Link href="/offers/new">
+        <Link href="/my-offers/new">
           <Plus className="mr-2 h-4 w-4" />
           Nouvelle offre
         </Link>

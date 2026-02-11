@@ -2,7 +2,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma/client'
 import { MobileLayout } from '@/components/layout/mobile-layout'
-import { BottomNavigation } from '@/components/custom/bottom-navigation'
+import { StoreNavWrapper } from '@/components/custom/store-nav-wrapper'
+import { getUnreadNotificationCount } from '@/lib/queries/notifications'
 
 export default async function StoreLayout({
   children,
@@ -24,8 +25,10 @@ export default async function StoreLayout({
     redirect('/')
   }
 
+  const unreadCount = await getUnreadNotificationCount(user.id, 'STORE')
+
   return (
-    <MobileLayout bottomNav={<BottomNavigation />}>
+    <MobileLayout bottomNav={<StoreNavWrapper userId={user.id} initialUnreadCount={unreadCount} />}>
       {children}
     </MobileLayout>
   )

@@ -5,6 +5,22 @@ vi.mock('@/lib/queries/offers', () => ({
   getActiveOffers: vi.fn(),
 }))
 
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: vi.fn().mockResolvedValue({
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } } }),
+    },
+  }),
+}))
+
+vi.mock('@/lib/prisma/client', () => ({
+  prisma: {
+    store: {
+      findUnique: vi.fn().mockResolvedValue({ brand: 'LECLERC' }),
+    },
+  },
+}))
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     refresh: vi.fn(),
@@ -21,6 +37,7 @@ vi.mock('next/link', () => ({
 import { Decimal } from '@prisma/client/runtime/library'
 import { getActiveOffers } from '@/lib/queries/offers'
 import type { OfferWithSupplier } from '@/lib/queries/offers'
+import { prisma } from '@/lib/prisma/client'
 import StoreOffersPage from './page'
 
 function createMockOfferWithSupplier(overrides: Partial<OfferWithSupplier> = {}): OfferWithSupplier {
@@ -80,5 +97,16 @@ describe('StoreOffersPage', () => {
     await StoreOffersPage()
 
     expect(getActiveOffers).toHaveBeenCalled()
+  })
+
+  it('fetches store brand for the authenticated user', async () => {
+    vi.mocked(getActiveOffers).mockResolvedValue([createMockOfferWithSupplier()])
+
+    await StoreOffersPage()
+
+    expect(prisma.store.findUnique).toHaveBeenCalledWith({
+      where: { id: 'user-1' },
+      select: { brand: true },
+    })
   })
 })

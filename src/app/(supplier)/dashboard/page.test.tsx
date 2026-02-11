@@ -124,7 +124,7 @@ describe('DashboardPage', () => {
     })
   })
 
-  it('renders the FloatingActionButton linking to /offers/new', async () => {
+  it('renders the FloatingActionButton linking to /my-offers/new', async () => {
     vi.mocked(createClient).mockResolvedValue({
       auth: {
         getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } } }),
@@ -136,6 +136,6 @@ describe('DashboardPage', () => {
     render(result as React.ReactElement)
 
     const fabLink = screen.getByRole('link', { name: /créer une nouvelle offre/i })
-    expect(fabLink).toHaveAttribute('href', '/offers/new')
+    expect(fabLink).toHaveAttribute('href', '/my-offers/new')
   })
 })

@@ -9,6 +9,12 @@ vi.mock('next/navigation', () => ({
   }),
 }))
 
+vi.mock('next/link', () => ({
+  default: ({ children, href, ...props }: { children: React.ReactNode; href: string }) => (
+    <a href={href} {...props}>{children}</a>
+  ),
+}))
+
 describe('PageHeader', () => {
   it('renders title correctly', () => {
     render(<PageHeader title="Test Title" />)
@@ -51,5 +57,27 @@ describe('PageHeader', () => {
     const backButton = screen.getByRole('button', { name: /retour/i })
 
     expect(backButton).toHaveAttribute('aria-label', 'Retour')
+  })
+
+  it('renders a link instead of button when backHref is provided', () => {
+    render(<PageHeader title="Test" showBack backHref="/requests" />)
+
+    const backLink = screen.getByRole('link', { name: /retour/i })
+    expect(backLink).toHaveAttribute('href', '/requests')
+  })
+
+  it('backHref link has accessible label', () => {
+    render(<PageHeader title="Test" showBack backHref="/requests" />)
+
+    const backLink = screen.getByRole('link', { name: /retour/i })
+    expect(backLink).toHaveAttribute('aria-label', 'Retour')
+  })
+
+  it('backHref link has minimum touch target size', () => {
+    render(<PageHeader title="Test" showBack backHref="/requests" />)
+
+    const backLink = screen.getByRole('link', { name: /retour/i })
+    expect(backLink).toHaveClass('min-w-[44px]')
+    expect(backLink).toHaveClass('min-h-[44px]')
   })
 })

@@ -12,6 +12,7 @@ describe('SupplierBottomNavigation', () => {
 
     expect(screen.getByRole('link', { name: /offres/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /demandes/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /notifs/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /profil/i })).toBeInTheDocument()
   })
 
@@ -20,6 +21,7 @@ describe('SupplierBottomNavigation', () => {
 
     expect(screen.getByRole('link', { name: /offres/i })).toHaveAttribute('href', '/dashboard')
     expect(screen.getByRole('link', { name: /demandes/i })).toHaveAttribute('href', '/requests')
+    expect(screen.getByRole('link', { name: /notifs/i })).toHaveAttribute('href', '/notifications')
     expect(screen.getByRole('link', { name: /profil/i })).toHaveAttribute('href', '/profile')
   })
 
@@ -68,5 +70,46 @@ describe('SupplierBottomNavigation', () => {
 
     const offresLink = screen.getByRole('link', { name: /offres/i })
     expect(offresLink).toHaveClass('text-primary')
+  })
+
+  describe('notification badge', () => {
+    it('shows badge on Demandes when unreadRequestCount > 0', () => {
+      render(<SupplierBottomNavigation unreadRequestCount={3} />)
+
+      expect(screen.getByText('3')).toBeInTheDocument()
+    })
+
+    it('does not show badge when unreadRequestCount is 0', () => {
+      render(<SupplierBottomNavigation unreadRequestCount={0} />)
+
+      expect(screen.queryByText('0')).not.toBeInTheDocument()
+    })
+
+    it('does not show badge by default (no prop)', () => {
+      const { container } = render(<SupplierBottomNavigation />)
+
+      // Badge renders as a span with bg-destructive class — should not be present
+      expect(container.querySelector('span.bg-destructive')).not.toBeInTheDocument()
+    })
+
+    it('shows "99+" for counts over 99', () => {
+      render(<SupplierBottomNavigation unreadRequestCount={150} />)
+
+      expect(screen.getByText('99+')).toBeInTheDocument()
+    })
+
+    it('updates aria-label on Demandes link when badge is shown', () => {
+      render(<SupplierBottomNavigation unreadRequestCount={5} />)
+
+      const demandesLink = screen.getByRole('link', { name: /demandes.*5 non lues/i })
+      expect(demandesLink).toBeInTheDocument()
+    })
+
+    it('does not add count to aria-label when no unread', () => {
+      render(<SupplierBottomNavigation unreadRequestCount={0} />)
+
+      const demandesLink = screen.getByRole('link', { name: 'Demandes' })
+      expect(demandesLink).toBeInTheDocument()
+    })
   })
 })

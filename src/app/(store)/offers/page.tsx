@@ -4,14 +4,26 @@ import { PageHeader } from '@/components/layout/page-header'
 import { StoreOfferList } from '@/components/custom/store-offer-list'
 import { getActiveOffers } from '@/lib/queries/offers'
 import { serializeOfferWithSupplier } from '@/lib/utils/offers'
+import { createClient } from '@/lib/supabase/server'
+import { prisma } from '@/lib/prisma/client'
 
 export const metadata: Metadata = {
   title: 'Offres disponibles',
 }
 
 export default async function StoreOffersPage() {
-  const offers = await getActiveOffers()
+  const supabase = await createClient()
+
+  const [{ data: { user } }, offers] = await Promise.all([
+    supabase.auth.getUser(),
+    getActiveOffers(),
+  ])
+
   const serializedOffers = offers.map(serializeOfferWithSupplier)
+
+  const store = user
+    ? await prisma.store.findUnique({ where: { id: user.id }, select: { brand: true } })
+    : null
 
   return (
     <>
@@ -28,7 +40,7 @@ export default async function StoreOffersPage() {
             </p>
           </div>
         ) : (
-          <StoreOfferList offers={serializedOffers} />
+          <StoreOfferList offers={serializedOffers} storeBrand={store?.brand} />
         )}
       </div>
     </>

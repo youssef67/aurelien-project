@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { prisma } from '@/lib/prisma/client'
 
 export async function getActiveOffers() {
@@ -20,3 +21,12 @@ export async function getActiveOffers() {
 }
 
 export type OfferWithSupplier = Awaited<ReturnType<typeof getActiveOffers>>[number]
+
+export const getOfferForStoreDetail = cache(async (id: string) => {
+  return prisma.offer.findFirst({
+    where: { id, deletedAt: null },
+    include: { supplier: { select: { companyName: true } } },
+  })
+})
+
+export type OfferDetail = Awaited<ReturnType<typeof getOfferForStoreDetail>>

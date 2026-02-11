@@ -108,7 +108,7 @@ export function EditOfferForm({ offer, supplierId }: EditOfferFormProps) {
       const result = await updateOffer(data)
       if (result.success) {
         toast.success('Offre modifiée')
-        router.push(`/offers/${offer.id}`)
+        router.push(`/my-offers/${offer.id}`)
       } else {
         toast.error(result.error)
       }

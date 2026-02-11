@@ -2,7 +2,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma/client'
 import { MobileLayout } from '@/components/layout/mobile-layout'
-import { SupplierBottomNavigation } from '@/components/custom/supplier-bottom-navigation'
+import { SupplierNavWrapper } from '@/components/custom/supplier-nav-wrapper'
+import { getUnreadNotificationCount } from '@/lib/queries/notifications'
 
 export default async function SupplierLayout({
   children,
@@ -24,8 +25,10 @@ export default async function SupplierLayout({
     redirect('/profile')
   }
 
+  const unreadCount = await getUnreadNotificationCount(user.id, 'SUPPLIER')
+
   return (
-    <MobileLayout bottomNav={<SupplierBottomNavigation />}>
+    <MobileLayout bottomNav={<SupplierNavWrapper userId={user.id} initialUnreadCount={unreadCount} />}>
       {children}
     </MobileLayout>
   )

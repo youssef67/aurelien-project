@@ -22,7 +22,7 @@ describe('EmptyOffersState', () => {
 
     const ctaLink = screen.getByRole('link', { name: /nouvelle offre/i })
     expect(ctaLink).toBeInTheDocument()
-    expect(ctaLink).toHaveAttribute('href', '/offers/new')
+    expect(ctaLink).toHaveAttribute('href', '/my-offers/new')
   })
 
   it('renders the Package icon illustration', () => {

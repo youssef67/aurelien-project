@@ -81,6 +81,15 @@ describe('getOfferDisplayStatus', () => {
     expect(result.label).toBe('Active')
   })
 
+  it('returns expired for EXPIRED status even with future endDate', () => {
+    const offer = { status: 'EXPIRED' as const, endDate: new Date('2099-12-31') }
+    const result = getOfferDisplayStatus(offer)
+
+    expect(result.key).toBe('expired')
+    expect(result.label).toBe('Expirée')
+    expect(result.variant).toBe('secondary')
+  })
+
   it('accepts string endDate', () => {
     const offer = { status: 'ACTIVE' as const, endDate: '2099-12-31T00:00:00.000Z' }
     const result = getOfferDisplayStatus(offer)

@@ -99,11 +99,11 @@ describe('OfferCard', () => {
     expect(img.getAttribute('src')).toContain('photo.jpg')
   })
 
-  it('links to /offers/[id]', () => {
+  it('links to /my-offers/[id]', () => {
     render(<OfferCard offer={createSerializedOffer({ id: 'abc-123' })} />)
 
     const link = screen.getByRole('link')
-    expect(link).toHaveAttribute('href', '/offers/abc-123')
+    expect(link).toHaveAttribute('href', '/my-offers/abc-123')
   })
 
   it('has aria-labelledby on article', () => {

@@ -50,7 +50,7 @@ export default async function OfferDetailPage({ params }: OfferDetailPageProps) 
         title={offer.name}
         showBack
         actions={
-          <Link href={`/offers/${offer.id}/edit`}>
+          <Link href={`/my-offers/${offer.id}/edit`}>
             <Button variant="ghost" size="sm" className="h-11">
               <Pencil className="mr-1 h-4 w-4" />
               Modifier

@@ -117,7 +117,7 @@ describe('OfferDetailPage', () => {
 
     const modifyButton = screen.getByRole('link', { name: /modifier/i })
     expect(modifyButton).toBeInTheDocument()
-    expect(modifyButton).toHaveAttribute('href', '/offers/offer-uuid-1/edit')
+    expect(modifyButton).toHaveAttribute('href', '/my-offers/offer-uuid-1/edit')
   })
 
   it('displays optional fields when present', async () => {
